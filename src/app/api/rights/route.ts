@@ -9,7 +9,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { question, category: cat, language = 'en' } = body;
+    const question = body.question || body.query;
+    const { category: cat, language = 'en' } = body;
     category = cat || 'delayed_wages';
 
     if (!question || typeof question !== 'string' || question.trim().length === 0) {

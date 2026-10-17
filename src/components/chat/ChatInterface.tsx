@@ -91,7 +91,9 @@ export function ChatInterface({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          question: text,
           query: text,
+          category: category || 'delayed_wages',
           language,
           workerProfile,
         }),
