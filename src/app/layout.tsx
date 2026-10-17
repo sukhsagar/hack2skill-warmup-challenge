@@ -29,7 +29,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap"
           rel="stylesheet"
         />
         <link
@@ -37,7 +37,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[#F8F7F2] text-[#111A15] font-sans antialiased selection:bg-[#A0F3D1]">
+      <body className="min-h-full flex flex-col bg-[#F7F8F3] text-[#17251F] font-sans antialiased selection:bg-[#B8EF43] selection:text-[#0B3328]">
         {children}
       </body>
     </html>
