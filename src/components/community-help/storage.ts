@@ -185,4 +185,137 @@ export const SAMPLE_COMMUNITY_REQUESTS: CommunityRequest[] = [
     userDisplayName: 'Partner V. (Zepto)',
     isDemoExample: true,
   },
+  {
+    id: 'demo_sample_4_blood',
+    type: 'medical',
+    category: 'blood_requirement',
+    title: 'Urgent B+ Blood Units for Injured Delivery Partner',
+    sanitizedDescription:
+      'Partner admitted to Bowring Hospital after road accident during peak shift. 2 units of B+ or O+ blood urgently required. Fellow partners please coordinate via community relay.',
+    broadLocation: 'Shivajinagar, Bengaluru',
+    bloodGroupRequired: 'B+',
+    language: 'en',
+    urgency: 'immediate',
+    contactPreference: 'phone_relay',
+    consentGiven: true,
+    status: 'open',
+    createdAt: new Date(Date.now() - 3600000 * 4).toISOString(),
+    updatedAt: new Date(Date.now() - 3600000 * 4).toISOString(),
+    userId: 'demo_user_blood_req',
+    userDisplayName: 'Union Rep Santosh (AITUC Gig Wing)',
+    isDemoExample: true,
+  },
 ];
+
+/**
+ * Verified peer worker blood donors in the community network.
+ * Workers register their willingness to donate via their worker profile.
+ */
+export const PEER_BLOOD_DONORS = [
+  {
+    id: 'donor_1',
+    name: 'Manjunath K.',
+    bloodGroup: 'B+',
+    city: 'Bengaluru',
+    contactRelay: '98451XXXXX (Direct via Community Relay)',
+    lastActive: 'Active 2h ago',
+    verifiedWorker: true,
+    platform: 'Swiggy',
+  },
+  {
+    id: 'donor_2',
+    name: 'Gurpreet Singh',
+    bloodGroup: 'O+',
+    city: 'Delhi NCR',
+    contactRelay: '98112XXXXX (Verified Driver Partner)',
+    lastActive: 'Active 15m ago',
+    verifiedWorker: true,
+    platform: 'Uber',
+  },
+  {
+    id: 'donor_3',
+    name: 'Anand Kumar',
+    bloodGroup: 'O-',
+    city: 'Bengaluru',
+    contactRelay: '99803XXXXX (Universal Donor Volunteer)',
+    lastActive: 'Active 1d ago',
+    verifiedWorker: true,
+    platform: 'Zomato',
+  },
+  {
+    id: 'donor_4',
+    name: 'Rajesh Sharma',
+    bloodGroup: 'A+',
+    city: 'Delhi NCR',
+    contactRelay: '98710XXXXX (Dark Store Lead)',
+    lastActive: 'Active 30m ago',
+    verifiedWorker: true,
+    platform: 'Blinkit',
+  },
+  {
+    id: 'donor_5',
+    name: 'Praveen Gowda',
+    bloodGroup: 'B+',
+    city: 'Bengaluru',
+    contactRelay: '97405XXXXX (Delivery Partner)',
+    lastActive: 'Active today',
+    verifiedWorker: true,
+    platform: 'Zepto',
+  },
+  {
+    id: 'donor_6',
+    name: 'Mohd. Imran',
+    bloodGroup: 'AB+',
+    city: 'Mumbai',
+    contactRelay: '98204XXXXX (Logistics Partner)',
+    lastActive: 'Active 1h ago',
+    verifiedWorker: true,
+    platform: 'Porter',
+  },
+  {
+    id: 'donor_7',
+    name: 'Vikas Patil',
+    bloodGroup: 'O+',
+    city: 'Mumbai',
+    contactRelay: '98331XXXXX (Cab Partner)',
+    lastActive: 'Active today',
+    verifiedWorker: true,
+    platform: 'Ola',
+  },
+  {
+    id: 'donor_8',
+    name: 'Sunil Verma',
+    bloodGroup: 'A-',
+    city: 'Bengaluru',
+    contactRelay: '96118XXXXX (Rider Partner)',
+    lastActive: 'Active today',
+    verifiedWorker: true,
+    platform: 'Swiggy',
+  },
+];
+
+/**
+ * Filter donors compatible with or matching the requested blood group.
+ */
+export function getMatchingDonors(requiredGroup?: string, city?: string) {
+  if (!requiredGroup) return PEER_BLOOD_DONORS;
+  
+  // Clean string
+  const target = requiredGroup.trim().toUpperCase();
+
+  return PEER_BLOOD_DONORS.filter((donor) => {
+    // Exact match or universal donors (O- is universal donor, O+ for Rh+)
+    const isExact = donor.bloodGroup === target;
+    const isUniversal = donor.bloodGroup === 'O-' || (target.includes('+') && donor.bloodGroup === 'O+');
+    const matchesGroup = isExact || isUniversal;
+
+    if (city && city.trim().length > 0) {
+      const cityClean = city.toLowerCase();
+      const matchesCity = donor.city.toLowerCase().includes(cityClean) || cityClean.includes(donor.city.toLowerCase());
+      return matchesGroup && matchesCity;
+    }
+
+    return matchesGroup;
+  });
+}
+

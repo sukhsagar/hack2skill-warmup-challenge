@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Language } from '@/types';
+import { Language, BloodGroup } from '@/types';
 import { MedicalCategory, UrgencyLevel, CommunityRequest } from './types';
 import { saveNewRequest } from './storage';
 import { communityI18n } from './i18n';
@@ -15,7 +15,9 @@ import {
   Loader2,
   Info,
   Bug,
+  Droplet,
 } from 'lucide-react';
+
 
 interface MedicalAidFormProps {
   language: Language;
@@ -31,6 +33,7 @@ export function MedicalAidForm({
   const t = communityI18n[language] || communityI18n.en;
 
   const [category, setCategory] = useState<MedicalCategory>('road_accident');
+  const [bloodGroupRequired, setBloodGroupRequired] = useState<BloodGroup>('B+');
   const [city, setCity] = useState<string>('');
   const [urgency, setUrgency] = useState<UrgencyLevel>('urgent');
   const [supportNeeded, setSupportNeeded] = useState<string>('');
@@ -91,9 +94,12 @@ export function MedicalAidForm({
         {
           type: 'medical',
           category,
-          title: `Medical Aid: ${category.replace('_', ' ').toUpperCase()}`,
+          title: category === 'blood_requirement'
+            ? `Emergency Blood Needed: ${bloodGroupRequired}`
+            : `Medical Aid: ${category.replace('_', ' ').toUpperCase()}`,
           sanitizedDescription: supportNeeded.trim(),
           broadLocation: city.trim(),
+          bloodGroupRequired: category === 'blood_requirement' ? bloodGroupRequired : undefined,
           language,
           urgency,
           contactPreference: contactMethod,
@@ -118,6 +124,7 @@ export function MedicalAidForm({
       setSubmitting(false);
     }
   };
+
 
   return (
     <div className="space-y-6">
@@ -176,6 +183,7 @@ export function MedicalAidForm({
               onChange={(e) => setCategory(e.target.value as MedicalCategory)}
               className="w-full px-4 py-3 rounded-xl bg-[#FAF9F5] border border-[#E5E4DD] text-sm font-medium text-on-surface focus:outline-hidden focus:border-primary focus:bg-white transition-colors"
             >
+              <option value="blood_requirement">🩸 Urgent Blood Requirement (Community Donor Matching)</option>
               <option value="road_accident">On-Duty Road Accident Logistics & Transport Support</option>
               <option value="first_aid">First Aid Kit / Minor Dressing Assistance</option>
               <option value="hospital_navigation">Government / Trust Hospital Admission Guidance</option>
@@ -186,6 +194,41 @@ export function MedicalAidForm({
             </select>
             {errors.category && <p className="text-xs text-red-600">{errors.category}</p>}
           </div>
+
+          {/* Blood Group Picker (Shown when category is blood_requirement) */}
+          {category === 'blood_requirement' && (
+            <div className="p-4 rounded-2xl bg-red-50/70 border border-red-200 space-y-3 animate-in fade-in">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-extrabold text-red-700 uppercase tracking-wider flex items-center gap-1.5">
+                  <Droplet className="w-4 h-4 text-red-600" />
+                  <span>Blood Group Needed</span>
+                </span>
+                <span className="text-[11px] font-bold text-red-600 bg-red-100 px-2.5 py-0.5 rounded-full">
+                  Community Donor Relay
+                </span>
+              </div>
+              <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+                {(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as BloodGroup[]).map((bg) => (
+                  <button
+                    key={bg}
+                    type="button"
+                    onClick={() => setBloodGroupRequired(bg)}
+                    className={`h-11 rounded-xl font-extrabold text-sm border transition-all ${
+                      bloodGroupRequired === bg
+                        ? 'bg-red-600 border-red-600 text-white shadow-xs scale-102'
+                        : 'bg-white border-red-200 text-red-900 hover:border-red-400'
+                    }`}
+                  >
+                    {bg}
+                  </button>
+                ))}
+              </div>
+              <p className="text-[11px] text-red-700 leading-relaxed font-medium">
+                Selecting a blood group will automatically alert nearby gig workers in your city who have registered as donors.
+              </p>
+            </div>
+          )}
+
 
           {/* Location & Contact Method Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

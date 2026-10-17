@@ -193,12 +193,22 @@ export function ProfileModal({
                     {workerProfile.registeredOnEShram ? 'Yes' : 'Pending'}
                   </span>
                 </div>
+                <div className="p-2.5 rounded-xl bg-white border border-red-200">
+                  <span className="text-red-700 block text-[11px] font-semibold">Blood Donation:</span>
+                  <span className="font-bold text-[#17251F] flex items-center gap-1">
+                    <span className="px-1.5 py-0.2 rounded-md bg-red-100 text-red-700 text-[10px] font-black">
+                      {workerProfile.bloodGroup || 'O+'}
+                    </span>
+                    <span>{workerProfile.isBloodDonor ? 'Active Volunteer' : 'Not Registered'}</span>
+                  </span>
+                </div>
               </div>
             ) : (
               <p className="text-xs text-[#64736A] leading-relaxed">
                 Add your operating platform and city to receive customized legal reasoning.
               </p>
             )}
+
           </div>
 
           {/* Language Selection */}

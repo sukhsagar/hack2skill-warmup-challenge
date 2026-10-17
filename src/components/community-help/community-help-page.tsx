@@ -310,3 +310,6 @@ export function CommunityHelpPage() {
     </div>
   );
 }
+
+export default CommunityHelpPage;
+

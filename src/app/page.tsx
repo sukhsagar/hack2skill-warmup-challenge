@@ -15,14 +15,8 @@ const ComplaintBuilder = dynamic(
   () => import('@/components/ComplaintBuilder').then((m) => m.ComplaintBuilder),
   { ssr: false }
 );
-const DraftsList = dynamic(
-  () => import('@/components/DraftsList').then((m) => m.DraftsList),
-  { ssr: false }
-);
-const CommunityHelpPage = dynamic(
-  () => import('@/components/community-help/community-help-page').then((m) => m.CommunityHelpPage),
-  { ssr: false }
-);
+const DraftsList = dynamic(() => import('@/components/DraftsList').then(mod => ({ default: mod.DraftsList })), { ssr: false });
+const CommunityHelpPage = dynamic(() => import('@/components/community-help/community-help-page').then(mod => ({ default: mod.CommunityHelpPage || mod.default })), { ssr: false });
 const ProfileModal = dynamic(
   () => import('@/components/chat/ProfileModal').then((m) => m.ProfileModal),
   { ssr: false }
@@ -33,7 +27,8 @@ const OnboardingModal = dynamic(
 );
 
 function MainApp() {
-  const { loading } = useAuth();
+  const { user, loading } = useAuth();
+
   const [currentTab, setCurrentTab] = useState<MainTab>('chat');
   const [language, setLanguage] = useState<Language>('en');
 
@@ -149,12 +144,15 @@ function MainApp() {
           {/* TAB 1: Chat-First Home Screen (Default) */}
           {currentTab === 'chat' && (
             <ChatInterface
+              key={user?.uid || 'guest'}
               language={language}
               workerProfile={workerProfile}
               onDraftComplaint={handleDraftComplaintFromChat}
               onOpenMedical={handleOpenMedical}
             />
           )}
+
+
 
           {/* TAB 2: Work & Formal Appeals */}
           {currentTab === 'work' && (

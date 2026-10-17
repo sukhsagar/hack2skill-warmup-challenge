@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const question = body.question || body.query;
-    const { category: cat, language = 'en' } = body;
+    const { category: cat, language = 'en', workerProfile } = body;
     category = cat || 'delayed_wages';
 
     if (!question || typeof question !== 'string' || question.trim().length === 0) {
@@ -46,9 +46,13 @@ export async function POST(req: NextRequest) {
         ? 'Respond entirely in simple, respectful, and accessible Punjabi (ਪੰਜਾਬੀ - Gurmukhi script). Avoid heavy legal jargon.'
         : 'Respond entirely in clear, respectful, plain English suitable for gig and platform workers.';
 
-    const systemPrompt = `You are Awaaz (Har Mazdoor Ki Awaaz), an empathetic and highly practical AI Rights Navigator for Indian gig and platform delivery workers (Zomato, Swiggy, Uber, Ola, Zepto, Blinkit, Porter, Urban Company, Amazon Flex).
+    const workerContextSnippet = workerProfile
+      ? `\nWORKER ONBOARDING PROFILE:\n- Role / Work Type: ${workerProfile.workType || 'gig worker'}\n- Primary Platform: ${workerProfile.primaryPlatform || 'general platform'}\n- Operating City: ${workerProfile.city || 'India'}\n- Vehicle Ownership: ${workerProfile.hasVehicle ? 'Own Two-Wheeler' : 'Rented / None'}\n- e-Shram Registration: ${workerProfile.registeredOnEShram === true ? 'Registered' : 'Not Registered / Pending'}\nTailor all advice specifically to their exact platform (${workerProfile.primaryPlatform || 'platform'}) and role rules.`
+      : '';
+
+    const systemPrompt = `You are Awaaz (Har Mazdoor Ki Awaaz), an empathetic and highly practical AI Rights Navigator for Indian gig and platform workers (Zomato, Swiggy, Uber, Ola, Zepto, Blinkit, Porter, Urban Company, Amazon Flex).${workerContextSnippet}
 Your objective:
-1. Explain the worker's practical situation in plain language.
+1. Explain the worker's practical situation in plain language, directly addressing their specific work role.
 2. Outline relevant statutory or platform protections (such as the Code on Social Security 2020, state gig worker legislation, Intermediary Guidelines, or consumer fairness).
 3. Offer concrete, step-by-step practical actions the worker can take right now.
 4. List essential evidence and documents they must preserve (screenshots, trip IDs, rate cards, payout statements).
@@ -77,6 +81,7 @@ Worker Question:
 """${question.replace(/"/g, "'")}"""
 
 Provide your structured guidance in JSON format:`;
+
 
     // Progressive token streaming for instant Time-To-First-Token
     if (req.nextUrl.searchParams.get('stream') === 'true') {

@@ -116,10 +116,11 @@ export function DraftsList({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4" role="list">
           {drafts.map((draft) => (
             <div
               key={draft.id}
+              role="listitem"
               onClick={() => onEditDraft(draft)}
               className="p-5 rounded-2xl bg-white border border-[#E5E4DD] hover:border-primary hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group space-y-4"
             >
@@ -157,6 +158,7 @@ export function DraftsList({
                     onClick={(e) => handleCopy(draft, e)}
                     className="p-2 rounded-lg bg-[#FAF9F5] hover:bg-primary-light hover:text-primary text-secondary transition-colors border border-[#E5E4DD]"
                     title={t.copyBtn}
+                    aria-label="Copy complaint to clipboard"
                   >
                     {copiedId === draft.id ? (
                       <Check className="w-3.5 h-3.5 text-primary" />
@@ -170,6 +172,7 @@ export function DraftsList({
                     onClick={(e) => handleDelete(draft.id, e)}
                     className="p-2 rounded-lg bg-[#FAF9F5] hover:bg-error-container/30 hover:text-error text-secondary transition-colors border border-[#E5E4DD]"
                     title={t.deleteDraftBtn}
+                    aria-label="Delete draft"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>

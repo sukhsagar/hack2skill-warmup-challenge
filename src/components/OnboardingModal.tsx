@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { WorkerOnboardingProfile, Language } from '@/types';
-import { User, Briefcase, MapPin, Bike, Shield, ArrowRight, X } from 'lucide-react';
+import { WorkerOnboardingProfile, Language, BloodGroup } from '@/types';
+import { User, Briefcase, MapPin, Bike, Shield, ArrowRight, X, Heart, Droplet } from 'lucide-react';
 
 interface OnboardingModalProps {
   language: Language;
@@ -30,6 +30,12 @@ export function OnboardingModal({
   const [registeredOnEShram, setRegisteredOnEShram] = useState<boolean | 'not_sure'>(
     initialProfile ? initialProfile.registeredOnEShram : 'not_sure'
   );
+  const [bloodGroup, setBloodGroup] = useState<BloodGroup | undefined>(
+    initialProfile?.bloodGroup || 'O+'
+  );
+  const [isBloodDonor, setIsBloodDonor] = useState<boolean>(
+    initialProfile?.isBloodDonor ?? true
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,8 +45,11 @@ export function OnboardingModal({
       city,
       hasVehicle,
       registeredOnEShram,
+      bloodGroup,
+      isBloodDonor,
     });
   };
+
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
@@ -215,6 +224,73 @@ export function OnboardingModal({
                 ))}
               </div>
             </div>
+          </div>
+
+          {/* Blood Donation Community Interest */}
+          <div className="p-3.5 rounded-xl border border-red-200 bg-red-50/60 space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-red-900 uppercase tracking-wider flex items-center gap-1.5">
+                <Heart className="w-3.5 h-3.5 text-red-600" />
+                <span>Community Blood Donation Volunteer</span>
+              </label>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+                Peer Aid Network
+              </span>
+            </div>
+
+            <p className="text-xs text-red-800 leading-relaxed font-medium">
+              If fellow gig workers meet with a road accident or emergency, would you be willing to be contacted as a volunteer donor?
+            </p>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsBloodDonor(true)}
+                className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-all ${
+                  isBloodDonor
+                    ? 'bg-red-600 text-white border-red-600 shadow-xs'
+                    : 'bg-white text-secondary border-red-200 hover:border-red-400'
+                }`}
+              >
+                ✓ Yes, I Want to Help Peers
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsBloodDonor(false)}
+                className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all ${
+                  !isBloodDonor
+                    ? 'bg-stone-700 text-white border-stone-700'
+                    : 'bg-white text-secondary border-red-200'
+                }`}
+              >
+                Not Now
+              </button>
+            </div>
+
+            {isBloodDonor && (
+              <div className="pt-2 border-t border-red-200/60 space-y-1.5">
+                <span className="text-[11px] font-bold text-red-900 uppercase tracking-wider flex items-center gap-1">
+                  <Droplet className="w-3 h-3 text-red-600" />
+                  <span>Your Blood Group</span>
+                </span>
+                <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
+                  {(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as BloodGroup[]).map((bg) => (
+                    <button
+                      key={bg}
+                      type="button"
+                      onClick={() => setBloodGroup(bg)}
+                      className={`h-9 rounded-lg font-bold text-xs border transition-all ${
+                        bloodGroup === bg
+                          ? 'bg-red-600 text-white border-red-600 shadow-xs'
+                          : 'bg-white text-red-900 border-red-200 hover:border-red-300'
+                      }`}
+                    >
+                      {bg}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Action Buttons */}

@@ -40,8 +40,9 @@ describe('WelcomeScreen Component UI & Accessibility', () => {
       </AuthProvider>
     );
 
-    const hindiBtn = screen.getByRole('button', { name: /हिंदी/i });
+    const hindiBtn = screen.getByRole('tab', { name: /हिंदी/i });
     fireEvent.click(hindiBtn);
     expect(handleSetLang).toHaveBeenCalledWith('hi');
   });
 });
+

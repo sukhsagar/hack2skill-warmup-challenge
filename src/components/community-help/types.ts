@@ -1,4 +1,4 @@
-import { Language } from '@/types';
+import { Language, BloodGroup } from '@/types';
 
 export type CommunityHelpType = 'legal' | 'medical';
 
@@ -14,6 +14,7 @@ export type LegalCategory =
   | 'other_legal';
 
 export type MedicalCategory =
+  | 'blood_requirement'
   | 'road_accident'
   | 'first_aid'
   | 'hospital_navigation'
@@ -24,6 +25,17 @@ export type MedicalCategory =
 
 export type UrgencyLevel = 'routine' | 'urgent' | 'immediate';
 
+export interface BloodDonorRecord {
+  id: string;
+  name: string;
+  bloodGroup: BloodGroup;
+  city: string;
+  contactRelay: string;
+  lastActive: string;
+  verifiedWorker: boolean;
+  platform: string;
+}
+
 export interface CommunityRequest {
   id: string;
   type: CommunityHelpType;
@@ -31,6 +43,7 @@ export interface CommunityRequest {
   title: string;
   sanitizedDescription: string;
   broadLocation: string; // Broad City or District only (e.g. "South Delhi", "Bengaluru")
+  bloodGroupRequired?: BloodGroup;
   language: Language;
   urgency: UrgencyLevel;
   contactPreference: 'in_app' | 'phone_relay' | 'email_relay';

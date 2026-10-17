@@ -130,25 +130,45 @@ const QUICK_ACTIONS: QuickActionItem[] = [
 
 interface QuickActionCardProps {
   language: Language;
+  workerProfile?: import('@/types').WorkerOnboardingProfile | null;
   onSelectAction: (promptText: string, category: ProblemCategory) => void;
   disabled?: boolean;
 }
 
 export function QuickActionCards({
   language,
+  workerProfile,
   onSelectAction,
   disabled = false,
 }: QuickActionCardProps) {
+  const roleName =
+
+    workerProfile?.workType === 'cab_driver'
+      ? 'driver partner'
+      : workerProfile?.workType === 'warehouse'
+      ? 'warehouse associate'
+      : workerProfile?.workType === 'home_services'
+      ? 'service partner'
+      : 'delivery partner';
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
-      {QUICK_ACTIONS.map((action) => (
-        <button
-          key={action.id}
-          type="button"
-          disabled={disabled}
-          onClick={() => onSelectAction(action.prompt[language] || action.prompt.en, action.category)}
-          className={`min-h-[110px] p-4 sm:p-5 rounded-2xl border text-left transition-all flex flex-col justify-between group hover:border-[#0B3328] hover:shadow-md active:scale-[0.98] cursor-pointer bg-white ${action.accentColor}`}
-        >
+      {QUICK_ACTIONS.map((action) => {
+        let basePrompt = action.prompt[language] || action.prompt.en;
+        if (workerProfile?.primaryPlatform) {
+          basePrompt = basePrompt.replace(/delivery\/driver partner/gi, `${workerProfile.primaryPlatform} ${roleName}`);
+          basePrompt = basePrompt.replace(/The company/gi, workerProfile.primaryPlatform);
+          basePrompt = basePrompt.replace(/कंपनी/gi, `${workerProfile.primaryPlatform}`);
+        }
+        return (
+          <button
+            key={action.id}
+            type="button"
+            disabled={disabled}
+            onClick={() => onSelectAction(basePrompt, action.category)}
+            className={`min-h-[110px] p-4 sm:p-5 rounded-2xl border text-left transition-all flex flex-col justify-between group hover:border-[#0B3328] hover:shadow-md active:scale-[0.98] cursor-pointer bg-white ${action.accentColor}`}
+          >
+
           <div className="flex items-start justify-between gap-3 w-full">
             <div className="flex items-center gap-2.5">
               <div className="w-10 h-10 rounded-xl bg-white border border-[#DDE5DD] flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-[#B8EF43] group-hover:border-[#B8EF43] transition-colors">
@@ -172,7 +192,8 @@ export function QuickActionCards({
             {action.description[language] || action.description.en}
           </p>
         </button>
-      ))}
+        );
+      })}
     </div>
   );
 }

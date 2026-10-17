@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { Language } from '@/types';
-import { PhoneCall, UserCheck, Shield } from 'lucide-react';
+import { PhoneCall, UserCheck } from 'lucide-react';
 
 interface AppHeaderProps {
   language: Language;
@@ -72,22 +72,53 @@ export function AppHeader({
             </a>
 
             {/* Language Switcher */}
-            <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-[#DDE5DD] shadow-xs">
-              {(['en', 'hi', 'pa'] as const).map((lang) => (
-                <button
-                  key={lang}
-                  type="button"
-                  onClick={() => setLanguage(lang)}
-                  className={`h-9 px-2.5 rounded-lg text-xs font-bold transition-all ${
-                    language === lang
-                      ? 'bg-[#0B3328] text-white shadow-xs'
-                      : 'text-[#64736A] hover:text-[#17251F]'
-                  }`}
-                  aria-label={`Switch language to ${lang}`}
-                >
-                  {lang === 'en' ? 'EN' : lang === 'hi' ? 'हि' : 'ਪੰ'}
-                </button>
-              ))}
+            <div
+              role="tablist"
+              aria-label="Select Language"
+              className="flex items-center gap-1 bg-white p-1 rounded-xl border border-[#DDE5DD] shadow-xs"
+            >
+              <button
+                type="button"
+                role="tab"
+                aria-selected={language === 'en'}
+                onClick={() => setLanguage('en')}
+                className={`h-9 px-2.5 rounded-lg text-xs font-bold transition-all ${
+                  language === 'en'
+                    ? 'bg-[#0B3328] text-white shadow-xs'
+                    : 'text-[#64736A] hover:text-[#17251F]'
+                }`}
+                aria-label="Switch language to en"
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={language === 'hi'}
+                onClick={() => setLanguage('hi')}
+                className={`h-9 px-2.5 rounded-lg text-xs font-bold transition-all ${
+                  language === 'hi'
+                    ? 'bg-[#0B3328] text-white shadow-xs'
+                    : 'text-[#64736A] hover:text-[#17251F]'
+                }`}
+                aria-label="Switch language to hi"
+              >
+                हि
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={language === 'pa'}
+                onClick={() => setLanguage('pa')}
+                className={`h-9 px-2.5 rounded-lg text-xs font-bold transition-all ${
+                  language === 'pa'
+                    ? 'bg-[#0B3328] text-white shadow-xs'
+                    : 'text-[#64736A] hover:text-[#17251F]'
+                }`}
+                aria-label="Switch language to pa"
+              >
+                ਪੰ
+              </button>
             </div>
 
             {/* User Profile / Status Button */}

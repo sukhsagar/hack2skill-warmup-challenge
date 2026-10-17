@@ -108,6 +108,8 @@ export function Header({
                   : 'text-secondary hover:text-on-surface font-semibold'
               }`}
               type="button"
+              role="tab"
+              aria-selected={language === 'en'}
             >
               English
             </button>
@@ -119,6 +121,8 @@ export function Header({
                   : 'text-secondary hover:text-on-surface font-semibold'
               }`}
               type="button"
+              role="tab"
+              aria-selected={language === 'hi'}
             >
               हिंदी (Hindi)
             </button>
@@ -130,6 +134,8 @@ export function Header({
                   : 'text-secondary hover:text-on-surface font-semibold'
               }`}
               type="button"
+              role="tab"
+              aria-selected={language === 'pa'}
             >
               ਪੰਜਾਬੀ (Punjabi)
             </button>

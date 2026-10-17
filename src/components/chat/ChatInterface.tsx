@@ -16,7 +16,7 @@ interface ChatInterfaceProps {
   onOpenMedical: () => void;
 }
 
-const STORAGE_CHAT_KEY = 'awaaz_chat_history_v2';
+const STORAGE_CHAT_PREFIX = 'awaaz_chat_history_user_';
 
 let messageCounter = 0;
 const createUniqueId = (prefix: string) => {
@@ -31,34 +31,34 @@ export function ChatInterface({
   onOpenMedical,
 }: ChatInterfaceProps) {
   const { user } = useAuth();
+  const userStorageKey = `${STORAGE_CHAT_PREFIX}${user?.uid || 'guest'}`;
+
   const [messages, setMessages] = useState<ChatMessageItem[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = sessionStorage.getItem(STORAGE_CHAT_KEY);
-        if (saved) {
-          return JSON.parse(saved);
-        }
-      } catch {
-        // ignore
-      }
+    if (typeof window === 'undefined') return [];
+    try {
+      const saved = sessionStorage.getItem(userStorageKey);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
     }
-    return [];
   });
+
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  // Save chat history to sessionStorage
+  // Save chat history to sessionStorage for active user
   const persistMessages = (newMessages: ChatMessageItem[]) => {
     setMessages(newMessages);
     if (typeof window !== 'undefined') {
       try {
-        sessionStorage.setItem(STORAGE_CHAT_KEY, JSON.stringify(newMessages));
+        sessionStorage.setItem(userStorageKey, JSON.stringify(newMessages));
       } catch {
         // ignore
       }
     }
   };
+
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -145,15 +145,32 @@ export function ChatInterface({
     }
   };
 
+  const getRoleDisplayName = () => {
+    if (!workerProfile) return 'Partner';
+    switch (workerProfile.workType) {
+      case 'cab_driver':
+        return 'Cab & Auto Driver';
+      case 'warehouse':
+        return 'Warehouse & Logistics Associate';
+      case 'home_services':
+        return 'Home Services Specialist';
+      case 'daily_wage':
+        return 'Construction & Daily Wage Worker';
+      default:
+        return 'Delivery Partner';
+    }
+  };
+
   const getGreeting = () => {
     const firstName = user?.displayName ? user.displayName.split(' ')[0] : 'Partner';
+    const role = workerProfile?.workType ? ` (${getRoleDisplayName()})` : '';
     switch (language) {
       case 'hi':
-        return `नमस्ते, ${firstName}`;
+        return `नमस्ते, ${firstName}${role}`;
       case 'pa':
-        return `ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ, ${firstName}`;
+        return `ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ, ${firstName}${role}`;
       default:
-        return `Hello, ${firstName}`;
+        return `Hello, ${firstName}${role}`;
     }
   };
 
@@ -173,11 +190,18 @@ export function ChatInterface({
                     AI Companion Active
                   </span>
                 </div>
-                {user?.isDemoUser && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#EBF7EB] text-[#0B3328] border border-[#0B3328]/10">
-                    Demo Worker Mode
-                  </span>
-                )}
+                <div className="flex items-center gap-2">
+                  {workerProfile && (
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-[#0B3328] text-[#B8EF43]">
+                      {workerProfile.primaryPlatform} • {workerProfile.city}
+                    </span>
+                  )}
+                  {user?.isDemoUser && (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#EBF7EB] text-[#0B3328] border border-[#0B3328]/10">
+                      Demo Worker Mode
+                    </span>
+                  )}
+                </div>
               </div>
 
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[#17251F] tracking-tight">
@@ -185,11 +209,19 @@ export function ChatInterface({
               </h2>
 
               <p className="text-[16px] sm:text-[17px] text-[#64736A] leading-relaxed font-medium max-w-2xl">
-                {language === 'hi'
-                  ? 'अपनी भाषा में बोलें या लिखें। डिलीवरी आईडी ब्लॉक, रुके हुए इंसेंटिव, सड़क दुर्घटना और कानूनी अधिकारों के समाधान तुरंत पाएं।'
-                  : language === 'pa'
-                  ? 'ਆਪਣੀ ਬੋਲੀ ਵਿੱਚ ਗੱਲ ਕਰੋ। ਆਈਡੀ ਬੰਦ ਹੋਣ, ਰੁਕੇ ਹੋਏ ਪੈਸੇ ਜਾਂ ਸੜਕ ਹਾਦਸੇ ਦੇ ਨਿਪਟਾਰੇ ਲਈ ਤੁਰੰਤ ਕਾਨੂੰਨੀ ਅਗਵਾਈ ਪ੍ਰਾਪਤ ਕਰੋ।'
-                  : 'Ask anything in plain language. Get instant statutory guidance, platform dispute letters, and emergency aid without complicated menus.'}
+                {workerProfile ? (
+                  language === 'hi'
+                    ? `${workerProfile.primaryPlatform} (${getRoleDisplayName()}) के लिए कानूनी अधिकार, पेआउट विवाद, और दुर्घटना बीमा समाधान तुरंत प्राप्त करें।`
+                    : language === 'pa'
+                    ? `${workerProfile.primaryPlatform} ਦੇ ਕਾਨੂੰਨੀ ਅਧਿਕਾਰ, ਰੁਕੀ ਕਮਾਈ ਅਤੇ ਮੈਡੀਕਲ ਸਹਾਇਤਾ ਲਈ ਤੁਰੰਤ ਮਾਰਗਦਰਸ਼ਨ ਲਵੋ।`
+                    : `Personalized legal advisor for your ${workerProfile.primaryPlatform} ${getRoleDisplayName()} role in ${workerProfile.city}. Ask anything in plain language.`
+                ) : (
+                  language === 'hi'
+                    ? 'अपनी भाषा में बोलें या लिखें। डिलीवरी आईडी ब्लॉक, रुके हुए इंसेंटिव, सड़क दुर्घटना और कानूनी अधिकारों के समाधान तुरंत पाएं।'
+                    : language === 'pa'
+                    ? 'ਆਪਣੀ ਬੋਲੀ ਵਿੱਚ ਗੱਲ ਕਰੋ। ਆਈਡੀ ਬੰਦ ਹੋਣ, ਰੁਕੇ ਹੋਏ ਪੈਸੇ ਜਾਂ ਸੜਕ ਹਾਦਸੇ ਦੇ ਨਿਪਟਾਰੇ ਲਈ ਤੁਰੰਤ ਕਾਨੂੰਨੀ ਅਗਵਾਈ ਪ੍ਰਾਪਤ ਕਰੋ।'
+                    : 'Ask anything in plain language. Get instant statutory guidance, platform dispute letters, and emergency aid without complicated menus.'
+                )}
               </p>
             </div>
 
@@ -202,11 +234,13 @@ export function ChatInterface({
               </div>
               <QuickActionCards
                 language={language}
+                workerProfile={workerProfile}
                 onSelectAction={(promptText, cat) => handleSendMessage(promptText, cat)}
                 disabled={isLoading}
               />
             </div>
           </div>
+
         ) : (
           /* Active Chat Conversation History */
           <div className="space-y-4">

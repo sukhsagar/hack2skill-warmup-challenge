@@ -8,6 +8,7 @@ import {
   updateRequestStatus,
   deleteUserRequest,
   SAMPLE_COMMUNITY_REQUESTS,
+  getMatchingDonors,
 } from './storage';
 import { communityI18n } from './i18n';
 import {
@@ -23,6 +24,11 @@ import {
   AlertTriangle,
   RefreshCw,
   FolderOpen,
+  Droplet,
+  Users,
+  PhoneCall,
+  X,
+  CheckCircle2,
 } from 'lucide-react';
 
 interface RequestListProps {
@@ -46,6 +52,11 @@ export function RequestList({
   const [loading, setLoading] = useState<boolean>(false);
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+
+  // Active Blood Donors Modal
+  const [activeBloodRequest, setActiveBloodRequest] = useState<CommunityRequest | null>(null);
+  const [contactedDonorId, setContactedDonorId] = useState<string | null>(null);
+
 
   // Filters
   const [typeFilter, setTypeFilter] = useState<'all' | 'legal' | 'medical'>('all');
@@ -330,6 +341,34 @@ export function RequestList({
                   <span className="capitalize">{req.urgency} Urgency</span>
                 </div>
 
+                {/* Blood Group Highlight & Contact Donors CTA */}
+                {req.category === 'blood_requirement' && (
+                  <div className="p-3 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-xl bg-red-600 text-white flex items-center justify-center font-extrabold text-xs shadow-xs">
+                        {req.bloodGroupRequired || 'ANY'}
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-red-950 flex items-center gap-1">
+                          <Droplet className="w-3.5 h-3.5 text-red-600" />
+                          <span>Blood Group Required: {req.bloodGroupRequired || 'Emergency Blood Units'}</span>
+                        </div>
+                        <span className="text-[11px] text-red-700">
+                          Matching donors ready in network
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveBloodRequest(req)}
+                      className="px-3 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all active:scale-98"
+                    >
+                      <Users className="w-3.5 h-3.5" />
+                      <span>Contact Donors</span>
+                    </button>
+                  </div>
+                )}
+
                 {/* Sanitized Body */}
                 <p className="text-xs text-secondary leading-relaxed bg-[#FAF9F5] p-3 rounded-2xl border border-[#E5E4DD] font-mono">
                   {req.sanitizedDescription}
@@ -392,6 +431,121 @@ export function RequestList({
           ))}
         </div>
       )}
+
+      {/* Blood Donor Match & Contact Modal */}
+      {activeBloodRequest && (
+        <div className="fixed inset-0 z-50 bg-[#111A15]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-lg rounded-3xl border border-[#E5E4DD] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95">
+            {/* Header */}
+            <div className="p-5 border-b border-[#E5E4DD] flex items-center justify-between bg-red-50/60">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-red-600 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                  <Droplet className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[#111A15]">
+                    Peer Donors Available ({activeBloodRequest.bloodGroupRequired || 'Matching Groups'})
+                  </h3>
+                  <span className="text-xs text-red-700 font-medium block">
+                    City / Area: {activeBloodRequest.broadLocation}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveBloodRequest(null);
+                  setContactedDonorId(null);
+                }}
+                className="p-2 rounded-xl text-secondary hover:text-on-surface hover:bg-white"
+                aria-label="Close dialog"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body: Matching Donor List */}
+            <div className="p-5 space-y-4 overflow-y-auto">
+              <div className="p-3.5 rounded-2xl bg-[#FAF9F5] border border-[#E5E4DD] text-xs text-secondary leading-relaxed">
+                <p>
+                  These gig workers in your community have volunteered to donate blood. You can connect with them directly through the community relay protocol:
+                </p>
+              </div>
+
+              {contactedDonorId && (
+                <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-medium flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Relay ping initiated! The peer volunteer has been alerted to coordinate transport & blood donation.</span>
+                </div>
+              )}
+
+              <div className="space-y-3">
+                {getMatchingDonors(activeBloodRequest.bloodGroupRequired, activeBloodRequest.broadLocation).map(
+                  (donor) => (
+                    <div
+                      key={donor.id}
+                      className="p-4 rounded-2xl border border-[#E5E4DD] bg-white hover:border-red-300 transition-all flex items-center justify-between gap-3 shadow-2xs"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-red-100 text-red-700 flex items-center justify-center font-extrabold text-sm border border-red-200 shrink-0">
+                          {donor.bloodGroup}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-on-surface">{donor.name}</span>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary-light text-primary border border-primary/20">
+                              {donor.platform}
+                            </span>
+                          </div>
+                          <div className="text-xs text-secondary mt-0.5 flex items-center gap-2">
+                            <span>{donor.city}</span>
+                            <span>•</span>
+                            <span className="text-emerald-700 font-medium">{donor.lastActive}</span>
+                          </div>
+                          <div className="text-[11px] font-mono text-secondary mt-1">
+                            {donor.contactRelay}
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setContactedDonorId(donor.id)}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs ${
+                          contactedDonorId === donor.id
+                            ? 'bg-emerald-600 text-white'
+                            : 'bg-red-600 hover:bg-red-700 text-white active:scale-95'
+                        }`}
+                      >
+                        <PhoneCall className="w-3.5 h-3.5" />
+                        <span>{contactedDonorId === donor.id ? 'Contacted' : 'Connect'}</span>
+                      </button>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-[#E5E4DD] bg-[#FAF9F5] flex items-center justify-between">
+              <span className="text-xs text-secondary font-medium">
+                Emergency ambulance service: <strong>108</strong>
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveBloodRequest(null);
+                  setContactedDonorId(null);
+                }}
+                className="px-4 py-2 rounded-xl bg-white border border-[#E5E4DD] hover:border-on-surface text-on-surface text-xs font-bold"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

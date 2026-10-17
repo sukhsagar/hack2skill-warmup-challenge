@@ -63,11 +63,16 @@ export interface ComplaintDraft {
   isSampleDraft?: boolean;
 }
 
+export type BloodGroup = 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
+
 export interface WorkerOnboardingProfile {
   workType: 'delivery' | 'cab_driver' | 'warehouse' | 'daily_wage' | 'home_services' | 'other';
   primaryPlatform: string;
   city: string;
   hasVehicle: boolean;
   registeredOnEShram: boolean | 'not_sure';
+  bloodGroup?: BloodGroup;
+  isBloodDonor?: boolean;
 }
+
 

@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   title: "Awaaz — Har Mazdoor Ki Awaaz",
   description:
     "Awaaz (हर मज़दूर की आवाज़ / ਹਰ ਮਜ਼ਦੂਰ ਦੀ ਅਵਾਜ਼) — AI-Powered Rights & Grievance Assistant for Indian delivery partners, drivers, daily-wage workers, and platform gig workers.",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({
