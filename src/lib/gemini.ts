@@ -127,6 +127,61 @@ export async function generateContentWithFallback(
   throw lastError || new Error('All candidate AI models (Gemini & Groq) failed to generate content');
 }
 
+/**
+ * Streaming inference using Gemini generateContentStream with progressive token delivery
+ */
+export async function generateContentStreamWithFallback(
+  systemPrompt: string,
+  userPrompt: string
+): Promise<ReadableStream<Uint8Array>> {
+  const { ai } = getGeminiClient();
+  const encoder = new TextEncoder();
+
+  if (ai) {
+    for (const modelName of FALLBACK_MODELS) {
+      try {
+        const model = ai.getGenerativeModel({
+          model: modelName,
+          generationConfig: {
+            temperature: 0.2,
+          },
+        });
+        const streamResult = await model.generateContentStream([
+          { text: systemPrompt },
+          { text: userPrompt },
+        ]);
+
+        return new ReadableStream<Uint8Array>({
+          async start(controller) {
+            try {
+              for await (const chunk of streamResult.stream) {
+                const chunkText = chunk.text();
+                if (chunkText) {
+                  controller.enqueue(encoder.encode(chunkText));
+                }
+              }
+              controller.close();
+            } catch (err) {
+              controller.error(err);
+            }
+          },
+        });
+      } catch (err) {
+        console.warn(`[Awaaz AI Streaming] Model ${modelName} stream failed. Trying next...`, err);
+      }
+    }
+  }
+
+  // Fallback to buffered content streamed out
+  const fallback = await generateContentWithFallback(ai, systemPrompt, userPrompt);
+  return new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(encoder.encode(fallback.text));
+      controller.close();
+    },
+  });
+}
+
 export const SAMPLE_RIGHTS_RESPONSES: Record<Language, RightsResponse> = {
   en: {
     plainExplanation:

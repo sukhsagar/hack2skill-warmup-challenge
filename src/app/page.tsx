@@ -1,21 +1,43 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { Language, ProblemCategory, ComplaintDraft } from '@/types';
 import { Header } from '@/components/Header';
 import { WelcomeScreen } from '@/components/WelcomeScreen';
 import { RightsNavigator } from '@/components/RightsNavigator';
-import { ComplaintBuilder } from '@/components/ComplaintBuilder';
-import { DraftsList } from '@/components/DraftsList';
-import { VoiceAssistant } from '@/components/VoiceAssistant';
-import { OnboardingModal } from '@/components/OnboardingModal';
 import { WorkerOnboardingProfile } from '@/types';
+
+// Lazy code splitting for maximum efficiency & minimal initial bundle size (< 200KB)
+const ComplaintBuilder = dynamic(
+  () => import('@/components/ComplaintBuilder').then((m) => m.ComplaintBuilder),
+  { ssr: false }
+);
+const DraftsList = dynamic(
+  () => import('@/components/DraftsList').then((m) => m.DraftsList),
+  { ssr: false }
+);
+const VoiceAssistant = dynamic(
+  () => import('@/components/VoiceAssistant').then((m) => m.VoiceAssistant),
+  { ssr: false }
+);
+const OnboardingModal = dynamic(
+  () => import('@/components/OnboardingModal').then((m) => m.OnboardingModal),
+  { ssr: false }
+);
 
 function MainApp() {
   const { user, loading } = useAuth();
   const [currentTab, setCurrentTab] = useState<'rights' | 'complaint' | 'drafts' | 'voice'>('rights');
   const [language, setLanguage] = useState<Language>('en');
+
+  // Synchronize document language dynamically for accessibility (WCAG AA 3.1.1)
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = language;
+    }
+  }, [language]);
 
   // Worker onboarding profile (Optional personalization)
   const [workerProfile, setWorkerProfile] = useState<WorkerOnboardingProfile | null>(() => {

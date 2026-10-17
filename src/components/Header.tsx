@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { Language } from '@/types';
 import { translations } from '@/lib/i18n';
@@ -35,11 +36,13 @@ export function Header({
             onClick={() => setCurrentTab('rights')}
           >
             <div className="h-11 w-auto max-w-[140px] flex items-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src="/logo.png"
                 alt="Awaaz - Har Mazdoor Ki Awaaz"
+                width={120}
+                height={40}
                 className="h-9 sm:h-10 w-auto object-contain drop-shadow-2xs"
+                priority
               />
             </div>
             <span className="px-2 py-0.5 rounded-full bg-primary-fixed text-[#003828] text-[11px] font-bold uppercase tracking-wider">
@@ -53,6 +56,7 @@ export function Header({
               className="h-10 px-3 rounded-lg bg-surface-container-lowest border border-[#E5E4DD] text-primary flex items-center gap-1.5 font-bold text-[14px] shadow-xs active:scale-95 transition-all"
               href="tel:14434"
               title="Helpline 14434"
+              aria-label="Call National Labor Helpline 14434"
             >
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping mr-0.5"></span>
               14434
@@ -62,10 +66,11 @@ export function Header({
               <div className="flex items-center gap-1.5 pl-2 border-l border-[#E5E4DD]">
                 <div className="flex items-center gap-1.5">
                   {user.photoURL ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img
+                    <Image
                       src={user.photoURL}
                       alt={user.displayName || 'Worker'}
+                      width={32}
+                      height={32}
                       className="w-8 h-8 rounded-full border border-primary/30"
                     />
                   ) : (
@@ -79,6 +84,7 @@ export function Header({
                   onClick={() => signOut()}
                   className="p-1.5 text-secondary hover:text-error hover:bg-error-container/30 rounded-lg transition-colors"
                   title={t.signOut}
+                  aria-label={t.signOut || "Sign out of account"}
                 >
                   <LogOut className="w-4 h-4" />
                 </button>

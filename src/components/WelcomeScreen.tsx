@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { Language, ProblemCategory } from '@/types';
 
@@ -184,11 +185,13 @@ export function WelcomeScreen({
         <div className="h-16 px-4 flex items-center justify-between max-w-xl mx-auto w-full">
           <div className="flex items-center gap-2.5">
             <div className="h-12 w-auto max-w-[130px] sm:max-w-[150px] flex items-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src="/logo.png"
                 alt="Awaaz - Har Mazdoor Ki Awaaz"
+                width={130}
+                height={40}
                 className="h-10 w-auto object-contain drop-shadow-2xs"
+                priority
               />
             </div>
             <span className="px-2 py-0.5 rounded-full bg-primary-fixed text-[#003828] text-[11px] font-bold uppercase tracking-wider">
@@ -199,6 +202,7 @@ export function WelcomeScreen({
           <a
             className="h-11 px-3.5 rounded-lg bg-surface-container-lowest border border-[#E5E4DD] text-primary flex items-center gap-1.5 font-bold text-[15px] shadow-xs active:scale-95 transition-all"
             href="tel:14434"
+            aria-label="Call National Labor Helpline 14434"
           >
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping mr-0.5"></span>
             Helpline
@@ -254,11 +258,13 @@ export function WelcomeScreen({
         {/* Prominent Brand Header & Hero Title */}
         <section className="pt-2 pb-5 text-left">
           <div className="mb-4 inline-block">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src="/logo.png"
               alt="Awaaz - Har Mazdoor Ki Awaaz"
+              width={160}
+              height={56}
               className="h-14 sm:h-16 w-auto object-contain filter drop-shadow-xs"
+              priority
             />
           </div>
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#E6F4EE] text-primary text-[13px] font-bold tracking-wide uppercase mb-2.5 block w-fit">
@@ -359,12 +365,12 @@ export function WelcomeScreen({
             {/* Feature Card 1: Payout & Wage Protection */}
             <article className="bg-white border border-[#E5E4DD] rounded-2xl overflow-hidden shadow-xs">
               <div className="h-44 sm:h-48 w-full overflow-hidden bg-surface-container relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   alt="Logistics warehouse worker checking wage slip outdoors"
                   className="w-full h-full object-cover object-center"
-                  loading="lazy"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuo9z-SKfLGwvMYD3cim5hn8qgug0N7KvtbIoL6U70EgT39GMalO_JlLou-UMXJGLT_5XD-XKRNyrfXhHnaHauc3R2NG87H_rgXL301GHDumv_cY5R9t62CvcX1mM4HzLqf0HnRo0uBDg4Ps9M0VkMkc7rdFGOIPvSYQumcDHL-SoGdcjwnTkOJqa4XkAEE93trLhEbTg84KuYvRlcCFJwHoY3eoaVGcXXEBDoTBqAxG56DgzR5Y_d"
+                  width={600}
+                  height={300}
                 />
                 <div className="absolute bottom-3 left-3 bg-[#111A15]/80 backdrop-blur-xs text-white text-[12px] font-bold px-2.5 py-1 rounded-md">
                   Statutory Wage Rights
@@ -383,12 +389,12 @@ export function WelcomeScreen({
             {/* Feature Card 2: ID Block & Suspension Relief */}
             <article className="bg-white border border-[#E5E4DD] rounded-2xl overflow-hidden shadow-xs">
               <div className="h-44 sm:h-48 w-full overflow-hidden bg-surface-container relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   alt="Delivery rider on motorcycle checking smartphone"
                   className="w-full h-full object-cover object-center"
-                  loading="lazy"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGBke3ZuB1ktKSaYAOfbfl8YkRmAzta-A5vEIlPdsN5LiLO9XnOXmIQ_XOKNjXnJtUba27dii46NblyGGMgOpjxSWpNUDPRUFdzbTWDObv2Be5X7XW9RTSRARDfOgn5d_ngZsHeD7zzVXuxJ3LNBGYt7FHeqjFnFUUG_cInNXzeXnab_FXZ49KxYuxdDvQx0HPz--OCt1fOrsuMW3C6Nn6LjCkqxB_f9cPeA2Itsv2ECtGPAEfnW6Z"
+                  width={600}
+                  height={300}
                 />
                 <div className="absolute bottom-3 left-3 bg-[#111A15]/80 backdrop-blur-xs text-white text-[12px] font-bold px-2.5 py-1 rounded-md">
                   App ID Appeal
@@ -407,12 +413,12 @@ export function WelcomeScreen({
             {/* Feature Card 3: Accident & Legal Relief */}
             <article className="bg-white border border-[#E5E4DD] rounded-2xl overflow-hidden shadow-xs">
               <div className="h-44 sm:h-48 w-full overflow-hidden bg-surface-container relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   alt="Auto and cab driver sitting inside vehicle holding smartphone"
                   className="w-full h-full object-cover object-center"
-                  loading="lazy"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDSnSf7I-wKUE_vR9Py-SyezU47RspcD0Njzasu9MldWw5phb44Eq3HybC4VGG8o9PNRy_5cVc_OMWAwN9uY3qrp_iHdd9hM5DGdzB1k_GKRGN8VReDALvxz7HHCzIPrv8tS-C2t5IsbL_YMK-eI-u-CVQlT_-YPetNKvj5mWkEB6kwkxQ1Vx0HX-pptGZcR3bxto02E30Eh2j-qwm9WBc8xD-_l9yYi0jlJvgat5ovF4rjScW1Jhb"
+                  width={600}
+                  height={300}
                 />
                 <div className="absolute bottom-3 left-3 bg-[#111A15]/80 backdrop-blur-xs text-white text-[12px] font-bold px-2.5 py-1 rounded-md">
                   Social Security & Medical

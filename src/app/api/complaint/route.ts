@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getGeminiClient, generateContentWithFallback, getSampleComplaint } from '@/lib/gemini';
+import { getGeminiClient, generateContentWithFallback, generateContentStreamWithFallback, getSampleComplaint } from '@/lib/gemini';
 import { ComplaintFormData, Language } from '@/types';
 
 export async function POST(req: NextRequest) {
@@ -88,6 +88,17 @@ Incident Description:
 """${incidentDescription.replace(/"/g, "'")}"""
 
 Draft the formal grievance in JSON:`;
+
+    // Progressive token streaming for instant Time-To-First-Token
+    if (req.nextUrl.searchParams.get('stream') === 'true') {
+      const stream = await generateContentStreamWithFallback(systemPrompt, userPrompt);
+      return new Response(stream, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Transfer-Encoding': 'chunked',
+        },
+      });
+    }
 
     const { text: responseText } = await generateContentWithFallback(ai, systemPrompt, userPrompt);
 

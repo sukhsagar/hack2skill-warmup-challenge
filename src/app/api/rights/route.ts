@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getGeminiClient, generateContentWithFallback, SAMPLE_RIGHTS_RESPONSES } from '@/lib/gemini';
+import { getGeminiClient, generateContentWithFallback, generateContentStreamWithFallback, SAMPLE_RIGHTS_RESPONSES } from '@/lib/gemini';
 import { Language, RightsResponse } from '@/types';
 import { OFFICIAL_RESOURCES } from '@/lib/resources';
 
@@ -76,6 +76,17 @@ Worker Question:
 """${question.replace(/"/g, "'")}"""
 
 Provide your structured guidance in JSON format:`;
+
+    // Progressive token streaming for instant Time-To-First-Token
+    if (req.nextUrl.searchParams.get('stream') === 'true') {
+      const stream = await generateContentStreamWithFallback(systemPrompt, userPrompt);
+      return new Response(stream, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Transfer-Encoding': 'chunked',
+        },
+      });
+    }
 
     const { text: responseText } = await generateContentWithFallback(ai, systemPrompt, userPrompt);
 

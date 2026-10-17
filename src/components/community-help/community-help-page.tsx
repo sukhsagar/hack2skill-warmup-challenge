@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { Language } from '@/types';
 import { getPersistenceStatus, loadUserRequests } from './storage';
@@ -72,8 +73,7 @@ export function CommunityHelpPage() {
               <div className="h-5 w-px bg-[#E5E4DD] hidden sm:block" />
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg bg-white border border-[#E5E4DD] flex items-center justify-center overflow-hidden p-0.5 shadow-2xs">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/logo.png" alt="Awaaz" className="w-full h-full object-contain" />
+                  <Image src="/logo.png" alt="Awaaz" width={32} height={32} className="w-full h-full object-contain" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
