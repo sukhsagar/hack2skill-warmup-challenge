@@ -9,11 +9,17 @@ import { RightsNavigator } from '@/components/RightsNavigator';
 import { ComplaintBuilder } from '@/components/ComplaintBuilder';
 import { DraftsList } from '@/components/DraftsList';
 import { VoiceAssistant } from '@/components/VoiceAssistant';
+import { OnboardingModal } from '@/components/OnboardingModal';
+import { WorkerOnboardingProfile } from '@/types';
 
 function MainApp() {
   const { user, loading } = useAuth();
   const [currentTab, setCurrentTab] = useState<'rights' | 'complaint' | 'drafts' | 'voice'>('rights');
   const [language, setLanguage] = useState<Language>('en');
+
+  // Worker onboarding profile (Optional personalization)
+  const [workerProfile, setWorkerProfile] = useState<WorkerOnboardingProfile | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
 
   // Passing state between Rights Navigator, Voice Assistant and Complaint Builder
   const [prefillDescription, setPrefillDescription] = useState<string>('');
@@ -23,6 +29,27 @@ function MainApp() {
 
   // Drafts count
   const [draftsCount, setDraftsCount] = useState<number>(0);
+
+  // Sync profile from localStorage on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const savedProfile = localStorage.getItem('awaaz_worker_profile');
+      if (savedProfile) {
+        setWorkerProfile(JSON.parse(savedProfile));
+      }
+    } catch (e) {
+      console.warn('Could not read saved worker profile', e);
+    }
+  }, []);
+
+  const handleSaveProfile = (profile: WorkerOnboardingProfile) => {
+    setWorkerProfile(profile);
+    setShowOnboarding(false);
+    try {
+      localStorage.setItem('awaaz_worker_profile', JSON.stringify(profile));
+    } catch {}
+  };
 
   // Sync drafts count from localStorage
   const updateDraftsCount = () => {
@@ -118,6 +145,8 @@ function MainApp() {
               language={language}
               onDraftComplaintFromIssue={handleDraftComplaintFromIssue}
               initialQuery={prefillDescription}
+              workerProfile={workerProfile}
+              onOpenOnboarding={() => setShowOnboarding(true)}
             />
           )}
 
@@ -210,6 +239,16 @@ function MainApp() {
           </a>
         </div>
       </nav>
+
+      {/* Optional Onboarding Form Modal */}
+      {showOnboarding && (
+        <OnboardingModal
+          language={language}
+          initialProfile={workerProfile}
+          onSaveProfile={handleSaveProfile}
+          onSkip={() => setShowOnboarding(false)}
+        />
+      )}
 
       <footer className="w-full border-t border-[#E5E4DD] bg-white py-6 px-4 text-center text-xs text-secondary mt-12 hidden sm:block">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
