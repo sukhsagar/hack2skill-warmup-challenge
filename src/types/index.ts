@@ -62,3 +62,12 @@ export interface ComplaintDraft {
   updatedAt: string;
   isSampleDraft?: boolean;
 }
+
+export interface WorkerOnboardingProfile {
+  workType: 'delivery' | 'cab_driver' | 'warehouse' | 'daily_wage' | 'home_services' | 'other';
+  primaryPlatform: string;
+  city: string;
+  hasVehicle: boolean;
+  registeredOnEShram: boolean | 'not_sure';
+}
+

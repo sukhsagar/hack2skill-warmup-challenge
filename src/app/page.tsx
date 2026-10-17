@@ -8,19 +8,48 @@ import { WelcomeScreen } from '@/components/WelcomeScreen';
 import { RightsNavigator } from '@/components/RightsNavigator';
 import { ComplaintBuilder } from '@/components/ComplaintBuilder';
 import { DraftsList } from '@/components/DraftsList';
+import { VoiceAssistant } from '@/components/VoiceAssistant';
+import { OnboardingModal } from '@/components/OnboardingModal';
+import { WorkerOnboardingProfile } from '@/types';
 
 function MainApp() {
   const { user, loading } = useAuth();
-  const [currentTab, setCurrentTab] = useState<'rights' | 'complaint' | 'drafts'>('rights');
+  const [currentTab, setCurrentTab] = useState<'rights' | 'complaint' | 'drafts' | 'voice'>('rights');
   const [language, setLanguage] = useState<Language>('en');
 
-  // Passing state between Rights Navigator and Complaint Builder
+  // Worker onboarding profile (Optional personalization)
+  const [workerProfile, setWorkerProfile] = useState<WorkerOnboardingProfile | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
+
+  // Passing state between Rights Navigator, Voice Assistant and Complaint Builder
   const [prefillDescription, setPrefillDescription] = useState<string>('');
   const [prefillCategory, setPrefillCategory] = useState<ProblemCategory>('delayed_wages');
   const [activeDraftToEdit, setActiveDraftToEdit] = useState<ComplaintDraft | null>(null);
+  const [lastGuidanceSummary, setLastGuidanceSummary] = useState<string>('');
 
   // Drafts count
   const [draftsCount, setDraftsCount] = useState<number>(0);
+
+  // Sync profile from localStorage on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const savedProfile = localStorage.getItem('awaaz_worker_profile');
+      if (savedProfile) {
+        setWorkerProfile(JSON.parse(savedProfile));
+      }
+    } catch (e) {
+      console.warn('Could not read saved worker profile', e);
+    }
+  }, []);
+
+  const handleSaveProfile = (profile: WorkerOnboardingProfile) => {
+    setWorkerProfile(profile);
+    setShowOnboarding(false);
+    try {
+      localStorage.setItem('awaaz_worker_profile', JSON.stringify(profile));
+    } catch {}
+  };
 
   // Sync drafts count from localStorage
   const updateDraftsCount = () => {
@@ -116,6 +145,24 @@ function MainApp() {
               language={language}
               onDraftComplaintFromIssue={handleDraftComplaintFromIssue}
               initialQuery={prefillDescription}
+              workerProfile={workerProfile}
+              onOpenOnboarding={() => setShowOnboarding(true)}
+            />
+          )}
+
+          {currentTab === 'voice' && (
+            <VoiceAssistant
+              language={language}
+              onSendToRights={(query) => {
+                setPrefillDescription(query);
+                setCurrentTab('rights');
+              }}
+              onSendToComplaint={(query) => {
+                setPrefillDescription(query);
+                setActiveDraftToEdit(null);
+                setCurrentTab('complaint');
+              }}
+              lastResponseText={lastGuidanceSummary || prefillDescription}
             />
           )}
 
@@ -152,6 +199,15 @@ function MainApp() {
             <span className="text-[12px] mt-0.5">Worker Codes</span>
           </button>
           <button
+            onClick={() => setCurrentTab('voice')}
+            className={`flex-1 flex flex-col items-center justify-center h-full transition-all ${
+              currentTab === 'voice' ? 'text-primary font-bold' : 'text-secondary font-medium'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[24px]">mic</span>
+            <span className="text-[12px] mt-0.5">Voice</span>
+          </button>
+          <button
             onClick={() => setCurrentTab('complaint')}
             className={`flex-1 flex flex-col items-center justify-center h-full transition-all ${
               currentTab === 'complaint' ? 'text-primary font-bold' : 'text-secondary font-medium'
@@ -169,7 +225,7 @@ function MainApp() {
             <span className="material-symbols-outlined text-[24px]">description</span>
             <span className="text-[12px] mt-0.5">My Appeals</span>
             {draftsCount > 0 && (
-              <span className="absolute top-2 right-6 px-1.5 py-0.2 text-[10px] rounded-full bg-primary text-white font-bold">
+              <span className="absolute top-2 right-4 px-1.5 py-0.2 text-[10px] rounded-full bg-primary text-white font-bold">
                 {draftsCount}
               </span>
             )}
@@ -179,10 +235,20 @@ function MainApp() {
             href="tel:14434"
           >
             <span className="material-symbols-outlined text-[24px]">call</span>
-            <span className="text-[12px] font-medium mt-0.5">Call 14434</span>
+            <span className="text-[12px] font-medium mt-0.5">14434</span>
           </a>
         </div>
       </nav>
+
+      {/* Optional Onboarding Form Modal */}
+      {showOnboarding && (
+        <OnboardingModal
+          language={language}
+          initialProfile={workerProfile}
+          onSaveProfile={handleSaveProfile}
+          onSkip={() => setShowOnboarding(false)}
+        />
+      )}
 
       <footer className="w-full border-t border-[#E5E4DD] bg-white py-6 px-4 text-center text-xs text-secondary mt-12 hidden sm:block">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">

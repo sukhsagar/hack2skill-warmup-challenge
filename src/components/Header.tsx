@@ -7,8 +7,8 @@ import { translations } from '@/lib/i18n';
 import { LogOut, User } from 'lucide-react';
 
 interface HeaderProps {
-  currentTab: 'rights' | 'complaint' | 'drafts';
-  setCurrentTab: (tab: 'rights' | 'complaint' | 'drafts') => void;
+  currentTab: 'rights' | 'complaint' | 'drafts' | 'voice';
+  setCurrentTab: (tab: 'rights' | 'complaint' | 'drafts' | 'voice') => void;
   language: Language;
   setLanguage: (lang: Language) => void;
   draftsCount: number;
@@ -148,6 +148,20 @@ export function Header({
             >
               <span className="material-symbols-outlined text-[18px]">balance</span>
               <span>{t.navRights}</span>
+            </button>
+
+            <button
+              onClick={() => setCurrentTab('voice')}
+              className={`flex items-center gap-2 px-3.5 py-2 text-[14px] font-bold border-b-2 transition-all whitespace-nowrap ${
+                currentTab === 'voice'
+                  ? 'border-primary text-primary bg-primary-light/50 rounded-t-lg'
+                  : 'border-transparent text-secondary hover:text-on-surface'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">mic</span>
+              <span>
+                {language === 'hi' ? 'आवाज़ सहायक' : language === 'pa' ? 'ਅਵਾਜ਼ ਸਹਾਇਕ' : 'Voice Assistant'}
+              </span>
             </button>
 
             <button

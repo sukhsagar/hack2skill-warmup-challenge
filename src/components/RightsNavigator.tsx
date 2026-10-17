@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Language, ProblemCategory, RightsResponse } from '@/types';
+import { Language, ProblemCategory, RightsResponse, WorkerOnboardingProfile } from '@/types';
 import { translations } from '@/lib/i18n';
+import { CROWDSOURCED_WORKER_PROBLEMS, CrowdSourcedIssue } from '@/lib/workerProblems';
 import {
   ExternalLink,
   ShieldAlert,
@@ -15,12 +16,16 @@ import {
   UserX,
   HeartPulse,
   Landmark,
+  SlidersHorizontal,
+  Flame,
 } from 'lucide-react';
 
 interface RightsNavigatorProps {
   language: Language;
   onDraftComplaintFromIssue: (desc: string, category: ProblemCategory) => void;
   initialQuery?: string;
+  workerProfile?: WorkerOnboardingProfile | null;
+  onOpenOnboarding?: () => void;
 }
 
 interface CategoryOption {
@@ -32,6 +37,8 @@ export function RightsNavigator({
   language,
   onDraftComplaintFromIssue,
   initialQuery = '',
+  workerProfile,
+  onOpenOnboarding,
 }: RightsNavigatorProps) {
   const t = translations[language];
   const [selectedCategory, setSelectedCategory] = useState<ProblemCategory>('delayed_wages');
@@ -88,7 +95,96 @@ export function RightsNavigator({
 
   return (
     <div className="space-y-6">
-      {/* Category Shortcuts */}
+      {/* Optional Onboarding / Personalization Banner */}
+      <div className="bg-white p-4 sm:p-5 rounded-2xl border border-[#E5E4DD] shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary-light text-primary flex items-center justify-center font-bold">
+            <SlidersHorizontal className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-on-surface">
+                {workerProfile
+                  ? `Personalized for: ${workerProfile.primaryPlatform} • ${workerProfile.city}`
+                  : 'Personalize Your Worker Rights'}
+              </span>
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-primary-fixed text-[#003828] font-bold uppercase">
+                {workerProfile ? 'Active' : 'Optional'}
+              </span>
+            </div>
+            <p className="text-xs text-secondary mt-0.5">
+              {workerProfile
+                ? `Role: ${workerProfile.workType.replace('_', ' ')} • e-Shram: ${
+                    workerProfile.registeredOnEShram === true ? 'Registered ✓' : 'Not registered'
+                  }`
+                : 'Tell us your platform & role to see personalized questions and relevant labor codes.'}
+            </p>
+          </div>
+        </div>
+
+        {onOpenOnboarding && (
+          <button
+            type="button"
+            onClick={onOpenOnboarding}
+            className="px-4 py-2 rounded-xl bg-[#FAF9F5] hover:bg-primary-light hover:text-primary text-secondary border border-[#E5E4DD] text-xs font-bold transition-all shrink-0"
+          >
+            {workerProfile ? 'Edit Profile' : 'Set Profile (30 sec)'}
+          </button>
+        )}
+      </div>
+
+      {/* Real Crowd-Sourced Issues (Reddit & Labor Unions) */}
+      <div className="bg-white p-5 rounded-2xl border border-[#E5E4DD] shadow-xs space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Flame className="w-4 h-4 text-amber-600" />
+            <h3 className="text-sm font-bold text-on-surface">
+              Common Real-World Grievances (Reddit & Gig Unions)
+            </h3>
+          </div>
+          <span className="text-[11px] text-secondary">
+            Tap any issue to query your rights
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          {CROWDSOURCED_WORKER_PROBLEMS.filter(
+            (p) =>
+              !workerProfile ||
+              p.workType === 'general' ||
+              p.workType === workerProfile.workType ||
+              p.platform === workerProfile.primaryPlatform
+          )
+            .slice(0, 3)
+            .map((issue) => (
+              <button
+                key={issue.id}
+                type="button"
+                onClick={() => {
+                  setSelectedCategory(issue.category);
+                  setQuestion(issue.workerQuote);
+                  handleAsk(issue.workerQuote);
+                }}
+                className="p-3 rounded-xl border border-[#E5E4DD] bg-[#FAF9F5] hover:border-primary hover:bg-white text-left transition-all flex flex-col justify-between group"
+              >
+                <div>
+                  <div className="flex items-center justify-between text-[11px] font-bold text-secondary mb-1">
+                    <span className="text-primary font-bold">{issue.platform || 'General'}</span>
+                    <span className="text-[10px] bg-white px-1.5 py-0.5 rounded border border-[#E5E4DD]">
+                      {issue.source}
+                    </span>
+                  </div>
+                  <h4 className="text-xs font-bold text-on-surface group-hover:text-primary line-clamp-2">
+                    {issue.title}
+                  </h4>
+                  <p className="text-[11px] text-secondary mt-1 line-clamp-2 italic">
+                    &ldquo;{issue.workerQuote}&rdquo;
+                  </p>
+                </div>
+              </button>
+            ))}
+        </div>
+      </div>
       <div className="bg-white p-5 rounded-2xl border border-[#E5E4DD] shadow-xs">
         <h3 className="text-xs font-bold text-secondary uppercase tracking-wider mb-3">
           Select Topic or Problem Category
