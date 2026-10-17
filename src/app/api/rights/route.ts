@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getGeminiClient, SAMPLE_RIGHTS_RESPONSES } from '@/lib/gemini';
+import { getGeminiClient, generateContentWithFallback, SAMPLE_RIGHTS_RESPONSES } from '@/lib/gemini';
 import { Language, RightsResponse } from '@/types';
 import { OFFICIAL_RESOURCES } from '@/lib/resources';
 
 export async function POST(req: NextRequest) {
+  let lang: Language = 'en';
+  let category: string = 'delayed_wages';
+
   try {
     const body = await req.json();
-    const { question, category, language = 'en' } = body;
+    const { question, category: cat, language = 'en' } = body;
+    category = cat || 'delayed_wages';
 
     if (!question || typeof question !== 'string' || question.trim().length === 0) {
       return NextResponse.json(
@@ -15,7 +19,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Limit query size to prevent abuse
     if (question.length > 2000) {
       return NextResponse.json(
         { error: 'Question is too long (maximum 2000 characters)' },
@@ -23,10 +26,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const lang: Language = (['en', 'hi', 'pa'].includes(language) ? language : 'en') as Language;
-    const { ai, modelName, isConfigured } = getGeminiClient();
+    lang = (['en', 'hi', 'pa'].includes(language) ? language : 'en') as Language;
+    const { ai, isConfigured } = getGeminiClient();
 
-    // If Gemini API Key is missing or default placeholder, gracefully return labeled sample response
     if (!isConfigured || !ai) {
       const sample = SAMPLE_RIGHTS_RESPONSES[lang] || SAMPLE_RIGHTS_RESPONSES.en;
       return NextResponse.json({
@@ -68,31 +70,18 @@ Return ONLY valid JSON matching this exact structure:
   "disclaimer": "string (brief legal disclaimer)"
 }`;
 
-    const userPrompt = `Worker Issue Category: ${category || 'General'}
+    const userPrompt = `Worker Issue Category: ${category}
 Worker Question:
 """${question.replace(/"/g, "'")}"""
 
 Provide your structured guidance in JSON format:`;
 
-    const model = ai.getGenerativeModel({
-      model: modelName,
-      generationConfig: {
-        responseMimeType: 'application/json',
-        temperature: 0.2,
-      },
-    });
+    const { text: responseText } = await generateContentWithFallback(ai, systemPrompt, userPrompt);
 
-    const result = await model.generateContent([
-      { text: systemPrompt },
-      { text: userPrompt },
-    ]);
-
-    const responseText = result.response.text();
     let parsed: Record<string, unknown>;
     try {
       parsed = JSON.parse(responseText);
     } catch {
-      // Fallback clean extraction
       const jsonMatch = responseText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         parsed = JSON.parse(jsonMatch[0]);
@@ -101,7 +90,6 @@ Provide your structured guidance in JSON format:`;
       }
     }
 
-    // Attach curated verified resources matching the category or general
     const relevantResources = OFFICIAL_RESOURCES.filter(
       (r) => r.category === category || r.category === 'general'
     ).slice(0, 3);
@@ -122,15 +110,13 @@ Provide your structured guidance in JSON format:`;
 
     return NextResponse.json(responseData);
   } catch (err: unknown) {
-    console.error('Rights API error:', err);
-    const e = err as Error;
-    return NextResponse.json(
-      {
-        error:
-          e.message ||
-          'Failed to process rights guidance request. Please try again in a moment.',
-      },
-      { status: 500 }
-    );
+    console.warn('Rights API encountered error, providing resilient fallback:', err);
+    // Graceful high-demand fallback
+    const sample = SAMPLE_RIGHTS_RESPONSES[lang] || SAMPLE_RIGHTS_RESPONSES.en;
+    return NextResponse.json({
+      ...sample,
+      isSampleResponse: true,
+      serviceBusy: true,
+    });
   }
 }

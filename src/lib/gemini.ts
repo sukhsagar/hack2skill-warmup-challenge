@@ -2,18 +2,60 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Language, RightsResponse, ComplaintFormData } from '@/types';
 import { OFFICIAL_RESOURCES } from './resources';
 
-const DEFAULT_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+export const FALLBACK_MODELS = [
+  process.env.GEMINI_MODEL || 'gemini-3.7-flash',
+  'gemini-3.8-flash',
+  'gemini-3.5-flash',
+  'gemini-3.1-flash-lite',
+  'gemini-flash-latest',
+];
 
 export function getGeminiClient(): { ai: GoogleGenerativeAI | null; modelName: string; isConfigured: boolean } {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || apiKey === 'YOUR_GEMINI_API_KEY' || apiKey.trim() === '') {
-    return { ai: null, modelName: DEFAULT_MODEL, isConfigured: false };
+    return { ai: null, modelName: FALLBACK_MODELS[0], isConfigured: false };
   }
   return {
     ai: new GoogleGenerativeAI(apiKey),
-    modelName: DEFAULT_MODEL,
+    modelName: FALLBACK_MODELS[0],
     isConfigured: true,
   };
+}
+
+export async function generateContentWithFallback(
+  ai: GoogleGenerativeAI,
+  systemPrompt: string,
+  userPrompt: string
+): Promise<{ text: string; modelUsed: string }> {
+  let lastError: Error | null = null;
+
+  for (const modelName of FALLBACK_MODELS) {
+    try {
+      const model = ai.getGenerativeModel({
+        model: modelName,
+        generationConfig: {
+          responseMimeType: 'application/json',
+          temperature: 0.2,
+        },
+      });
+
+      const result = await model.generateContent([
+        { text: systemPrompt },
+        { text: userPrompt },
+      ]);
+
+      const text = result.response.text();
+      if (text) {
+        return { text, modelUsed: modelName };
+      }
+    } catch (err: unknown) {
+      const e = err as Error;
+      console.warn(`[Awaaz AI] Model ${modelName} failed (${e.message.slice(0, 80)}). Trying fallback...`);
+      lastError = e;
+    }
+  }
+
+  throw lastError || new Error('All candidate Gemini models failed to generate content');
 }
 
 export const SAMPLE_RIGHTS_RESPONSES: Record<Language, RightsResponse> = {

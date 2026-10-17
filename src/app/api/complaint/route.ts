@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getGeminiClient, getSampleComplaint } from '@/lib/gemini';
+import { getGeminiClient, generateContentWithFallback, getSampleComplaint } from '@/lib/gemini';
 import { ComplaintFormData, Language } from '@/types';
 
 export async function POST(req: NextRequest) {
+  let body: ComplaintFormData | null = null;
+
   try {
-    const body: ComplaintFormData = await req.json();
+    body = await req.json();
     const {
       category,
       platform,
@@ -14,7 +16,7 @@ export async function POST(req: NextRequest) {
       workerIdentifier,
       desiredResolution,
       language = 'en',
-    } = body;
+    } = body || {};
 
     if (!incidentDescription || typeof incidentDescription !== 'string' || incidentDescription.trim().length === 0) {
       return NextResponse.json(
@@ -31,11 +33,11 @@ export async function POST(req: NextRequest) {
     }
 
     const lang: Language = (['en', 'hi', 'pa'].includes(language) ? language : 'en') as Language;
-    const { ai, modelName, isConfigured } = getGeminiClient();
+    const { ai, isConfigured } = getGeminiClient();
 
     // If Gemini API Key is missing, return labeled reference sample complaint
     if (!isConfigured || !ai) {
-      const sample = getSampleComplaint(body);
+      const sample = getSampleComplaint(body!);
       return NextResponse.json({
         ...sample,
         apiKeyMissing: true,
@@ -86,20 +88,8 @@ Incident Description:
 
 Draft the formal grievance in JSON:`;
 
-    const model = ai.getGenerativeModel({
-      model: modelName,
-      generationConfig: {
-        responseMimeType: 'application/json',
-        temperature: 0.2,
-      },
-    });
+    const { text: responseText } = await generateContentWithFallback(ai, systemPrompt, userPrompt);
 
-    const result = await model.generateContent([
-      { text: systemPrompt },
-      { text: userPrompt },
-    ]);
-
-    const responseText = result.response.text();
     let parsed: Record<string, unknown>;
     try {
       parsed = JSON.parse(responseText);
@@ -120,14 +110,18 @@ Draft the formal grievance in JSON:`;
       isSampleDraft: false,
     });
   } catch (err: unknown) {
-    console.error('Complaint API error:', err);
+    console.warn('Complaint API encountered error, providing resilient fallback:', err);
+    if (body) {
+      const sample = getSampleComplaint(body);
+      return NextResponse.json({
+        ...sample,
+        isSampleDraft: true,
+        serviceBusy: true,
+      });
+    }
     const e = err as Error;
     return NextResponse.json(
-      {
-        error:
-          e.message ||
-          'Failed to generate complaint draft. Please check your inputs and try again.',
-      },
+      { error: e.message || 'Failed to generate complaint draft.' },
       { status: 500 }
     );
   }
