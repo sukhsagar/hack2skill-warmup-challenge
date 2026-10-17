@@ -1,23 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --surface: #F8F7F2;
-  --background: #F8F7F2;
+  --surface: #FFFFFF;
+  --background: #F7F8F3;
   --surface-container-lowest: #FFFFFF;
-  --surface-container-low: #F2F1EA;
-  --surface-container: #EAE9E0;
-  --surface-container-high: #E2E0D5;
-  --on-surface: #111A15;
-  --on-surface-variant: #313C35;
-  --secondary: #4A554E;
+  --surface-container-low: #F3F5EE;
+  --surface-container: #EAECE2;
+  --surface-container-high: #E2E6D8;
+  --on-surface: #17251F;
+  --on-surface-variant: #304138;
+  --secondary: #64736A;
   --outline: #76827A;
-  --border-subtle: #E5E4DD;
-  --primary: #086B50;
-  --primary-dark: #00513B;
-  --primary-light: #E6F4EE;
-  --primary-fixed: #A0F3D1;
+  --border-subtle: #DDE5DD;
+  --primary: #0B3328;
+  --primary-dark: #07221B;
+  --primary-light: #EBF7EB;
+  --primary-fixed: #B8EF43;
+  --lime: #B8EF43;
+  --lime-dark: #9ED42B;
   --on-primary: #FFFFFF;
-  --error: #BA1A1A;
+  --error: #D32F2F;
   --error-container: #FFDAD6;
   --on-error: #FFFFFF;
 }
@@ -37,20 +39,22 @@
   --color-primary-dark: var(--primary-dark);
   --color-primary-light: var(--primary-light);
   --color-primary-fixed: var(--primary-fixed);
+  --color-lime: var(--lime);
+  --color-lime-dark: var(--lime-dark);
   --color-on-primary: var(--on-primary);
   --color-error: var(--error);
   --color-error-container: var(--error-container);
   --color-on-error: var(--on-error);
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 html, body {
   width: 100%;
   margin: 0;
   padding: 0;
-  background-color: #F8F7F2;
-  color: #111A15;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #F7F8F3;
+  color: #17251F;
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 body {

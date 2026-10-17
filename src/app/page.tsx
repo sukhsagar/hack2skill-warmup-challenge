@@ -3,11 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
-import { Language, ProblemCategory, ComplaintDraft } from '@/types';
-import { Header } from '@/components/Header';
-import { WelcomeScreen } from '@/components/WelcomeScreen';
-import { RightsNavigator } from '@/components/RightsNavigator';
-import { WorkerOnboardingProfile } from '@/types';
+import { Language, ProblemCategory, ComplaintDraft, WorkerOnboardingProfile } from '@/types';
+import { AppHeader } from '@/components/chat/AppHeader';
+import { ChatInterface } from '@/components/chat/ChatInterface';
+import { BottomNavigation } from '@/components/chat/BottomNavigation';
+import { MainTab } from '@/components/chat/types';
+import { ListFilter, PlusCircle } from 'lucide-react';
 
 // Lazy code splitting for maximum efficiency & minimal initial bundle size (< 200KB)
 const ComplaintBuilder = dynamic(
@@ -18,8 +19,12 @@ const DraftsList = dynamic(
   () => import('@/components/DraftsList').then((m) => m.DraftsList),
   { ssr: false }
 );
-const VoiceAssistant = dynamic(
-  () => import('@/components/VoiceAssistant').then((m) => m.VoiceAssistant),
+const CommunityHelpPage = dynamic(
+  () => import('@/components/community-help/community-help-page').then((m) => m.CommunityHelpPage),
+  { ssr: false }
+);
+const ProfileModal = dynamic(
+  () => import('@/components/chat/ProfileModal').then((m) => m.ProfileModal),
   { ssr: false }
 );
 const OnboardingModal = dynamic(
@@ -28,8 +33,8 @@ const OnboardingModal = dynamic(
 );
 
 function MainApp() {
-  const { user, loading } = useAuth();
-  const [currentTab, setCurrentTab] = useState<'rights' | 'complaint' | 'drafts' | 'voice'>('rights');
+  const { loading } = useAuth();
+  const [currentTab, setCurrentTab] = useState<MainTab>('chat');
   const [language, setLanguage] = useState<Language>('en');
 
   // Synchronize document language dynamically for accessibility (WCAG AA 3.1.1)
@@ -38,6 +43,9 @@ function MainApp() {
       document.documentElement.lang = language;
     }
   }, [language]);
+
+  // Work Sub-tab state ('new_appeal' | 'saved_appeals')
+  const [workSubTab, setWorkSubTab] = useState<'new_appeal' | 'saved_appeals'>('new_appeal');
 
   // Worker onboarding profile (Optional personalization)
   const [workerProfile, setWorkerProfile] = useState<WorkerOnboardingProfile | null>(() => {
@@ -49,13 +57,14 @@ function MainApp() {
       return null;
     }
   });
-  const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
 
-  // Passing state between Rights Navigator, Voice Assistant and Complaint Builder
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
+  const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
+
+  // Prefill state between Chat and Complaint Builder
   const [prefillDescription, setPrefillDescription] = useState<string>('');
   const [prefillCategory, setPrefillCategory] = useState<ProblemCategory>('delayed_wages');
   const [activeDraftToEdit, setActiveDraftToEdit] = useState<ComplaintDraft | null>(null);
-  const [lastGuidanceSummary, setLastGuidanceSummary] = useState<string>('');
 
   // Drafts count
   const [draftsCount, setDraftsCount] = useState<number>(0);
@@ -71,19 +80,23 @@ function MainApp() {
   // Sync drafts count from localStorage
   const updateDraftsCount = React.useCallback(() => {
     if (typeof window === 'undefined') return;
-    const storageKey = `awaaz_drafts_${user?.uid || 'guest'}`;
     try {
-      const data = localStorage.getItem(storageKey);
-      if (data) {
-        const parsed = JSON.parse(data);
-        setDraftsCount(Array.isArray(parsed) ? parsed.length : 0);
-      } else {
-        setDraftsCount(0);
+      let count = 0;
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('awaaz_drafts_')) {
+          const data = localStorage.getItem(key);
+          if (data) {
+            const parsed = JSON.parse(data);
+            if (Array.isArray(parsed)) count += parsed.length;
+          }
+        }
       }
+      setDraftsCount(count);
     } catch {
       setDraftsCount(0);
     }
-  }, [user?.uid]);
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -92,176 +105,150 @@ function MainApp() {
     return () => clearTimeout(timer);
   }, [updateDraftsCount]);
 
-  const handleDraftComplaintFromIssue = (desc: string, cat: ProblemCategory) => {
+  const handleDraftComplaintFromChat = (desc: string, cat?: ProblemCategory) => {
     setPrefillDescription(desc);
-    setPrefillCategory(cat);
-    setLastGuidanceSummary(desc);
+    if (cat) setPrefillCategory(cat);
     setActiveDraftToEdit(null);
-    setCurrentTab('complaint');
+    setWorkSubTab('new_appeal');
+    setCurrentTab('work');
   };
 
   const handleEditDraft = (draft: ComplaintDraft) => {
     setActiveDraftToEdit(draft);
-    setCurrentTab('complaint');
+    setWorkSubTab('new_appeal');
+    setCurrentTab('work');
+  };
+
+  const handleOpenMedical = () => {
+    setCurrentTab('community');
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8F7F2] flex items-center justify-center">
+      <div className="min-h-screen bg-[#F7F8F3] flex items-center justify-center">
         <div className="text-center space-y-3">
-          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-sm font-semibold text-secondary">Loading Awaaz...</p>
+          <div className="w-12 h-12 border-4 border-[#0B3328] border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-base font-bold text-[#64736A]">Loading Awaaz...</p>
         </div>
       </div>
     );
   }
 
-  if (!user) {
-    return (
-      <WelcomeScreen
-        language={language}
-        setLanguage={setLanguage}
-        onPreFillProblem={(desc, cat) => {
-          setPrefillDescription(desc);
-          setPrefillCategory(cat);
-          setCurrentTab('rights');
-        }}
-      />
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-[#F8F7F2] text-[#111A15] flex flex-col justify-between pb-20">
+    <div className="min-h-screen bg-[#F7F8F3] text-[#17251F] flex flex-col justify-between">
       <div>
-        <Header
-          currentTab={currentTab}
-          setCurrentTab={(tab) => {
-            setActiveDraftToEdit(null);
-            setCurrentTab(tab);
-          }}
+        {/* Compact Brand Header */}
+        <AppHeader
           language={language}
           setLanguage={setLanguage}
-          draftsCount={draftsCount}
+          onOpenProfile={() => setShowProfileModal(true)}
         />
 
-        <main className="max-w-xl sm:max-w-4xl mx-auto px-4 py-6">
-          {/* Demo User Info Banner */}
-          {user.isDemoUser && (
-            <div className="mb-6 p-3.5 rounded-xl bg-primary-light border border-primary/20 text-xs text-primary-dark flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[18px] text-primary">info</span>
-                <span>
-                  <strong>Logged in as Demo Worker Partner:</strong> Explore full features of Awaaz.
-                </span>
+        {/* Primary View Router */}
+        <main>
+          {/* TAB 1: Chat-First Home Screen (Default) */}
+          {currentTab === 'chat' && (
+            <ChatInterface
+              language={language}
+              workerProfile={workerProfile}
+              onDraftComplaint={handleDraftComplaintFromChat}
+              onOpenMedical={handleOpenMedical}
+            />
+          )}
+
+          {/* TAB 2: Work & Formal Appeals */}
+          {currentTab === 'work' && (
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
+              {/* Sub-navigation pill switcher */}
+              <div className="flex items-center justify-between gap-3 p-1.5 bg-white rounded-2xl border border-[#DDE5DD] shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveDraftToEdit(null);
+                    setWorkSubTab('new_appeal');
+                  }}
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all min-h-[48px] ${
+                    workSubTab === 'new_appeal'
+                      ? 'bg-[#0B3328] text-white shadow-xs'
+                      : 'text-[#64736A] hover:text-[#17251F]'
+                  }`}
+                >
+                  <PlusCircle className="w-4 h-4 text-[#B8EF43]" />
+                  <span>Draft New Appeal</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setWorkSubTab('saved_appeals')}
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all min-h-[48px] ${
+                    workSubTab === 'saved_appeals'
+                      ? 'bg-[#0B3328] text-white shadow-xs'
+                      : 'text-[#64736A] hover:text-[#17251F]'
+                  }`}
+                >
+                  <ListFilter className="w-4 h-4" />
+                  <span>My Saved Appeals</span>
+                  {draftsCount > 0 && (
+                    <span className="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-[#B8EF43] text-[#0B3328]">
+                      {draftsCount}
+                    </span>
+                  )}
+                </button>
               </div>
-              <span className="font-bold text-primary bg-white px-2 py-0.5 rounded border border-primary/20">
-                Evaluation Mode
-              </span>
+
+              {workSubTab === 'new_appeal' ? (
+                <ComplaintBuilder
+                  language={language}
+                  prefillDescription={prefillDescription}
+                  prefillCategory={prefillCategory}
+                  activeDraftToEdit={activeDraftToEdit}
+                  onDraftSaved={() => updateDraftsCount()}
+                />
+              ) : (
+                <DraftsList
+                  language={language}
+                  onEditDraft={handleEditDraft}
+                  onDraftCountChange={(count) => setDraftsCount(count)}
+                />
+              )}
             </div>
           )}
 
-          {/* Active Tab View */}
-          {currentTab === 'rights' && (
-            <RightsNavigator
+          {/* TAB 3: Community Help & Medical Aid */}
+          {currentTab === 'community' && (
+            <div className="pb-16">
+              <CommunityHelpPage />
+            </div>
+          )}
+
+          {/* TAB 4: Profile Modal */}
+          {showProfileModal && (
+            <ProfileModal
+              isOpen={showProfileModal}
+              onClose={() => setShowProfileModal(false)}
               language={language}
-              onDraftComplaintFromIssue={handleDraftComplaintFromIssue}
-              initialQuery={prefillDescription}
+              setLanguage={setLanguage}
               workerProfile={workerProfile}
-              onOpenOnboarding={() => setShowOnboarding(true)}
-            />
-          )}
-
-          {currentTab === 'voice' && (
-            <VoiceAssistant
-              language={language}
-              onSendToRights={(query) => {
-                setPrefillDescription(query);
-                setCurrentTab('rights');
-              }}
-              onSendToComplaint={(query) => {
-                setPrefillDescription(query);
-                setActiveDraftToEdit(null);
-                setCurrentTab('complaint');
-              }}
-              lastResponseText={lastGuidanceSummary || prefillDescription}
-            />
-          )}
-
-          {currentTab === 'complaint' && (
-            <ComplaintBuilder
-              language={language}
-              prefillDescription={prefillDescription}
-              prefillCategory={prefillCategory}
-              activeDraftToEdit={activeDraftToEdit}
-              onDraftSaved={() => updateDraftsCount()}
-            />
-          )}
-
-          {currentTab === 'drafts' && (
-            <DraftsList
-              language={language}
-              onEditDraft={handleEditDraft}
-              onDraftCountChange={(count) => setDraftsCount(count)}
+              onEditProfile={() => setShowOnboarding(true)}
             />
           )}
         </main>
       </div>
 
-      {/* Persistent Mobile Bottom Navigation Bar */}
-      <nav className="fixed bottom-0 w-full z-50 pb-safe bg-white border-t border-[#E5E4DD] shadow-lg sm:hidden">
-        <div className="flex justify-around items-center h-16 max-w-xl mx-auto px-2">
-          <button
-            onClick={() => setCurrentTab('rights')}
-            className={`flex-1 flex flex-col items-center justify-center h-full transition-all ${
-              currentTab === 'rights' ? 'text-primary font-bold' : 'text-secondary font-medium'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[24px]">balance</span>
-            <span className="text-[12px] mt-0.5">Worker Codes</span>
-          </button>
-          <button
-            onClick={() => setCurrentTab('voice')}
-            className={`flex-1 flex flex-col items-center justify-center h-full transition-all ${
-              currentTab === 'voice' ? 'text-primary font-bold' : 'text-secondary font-medium'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[24px]">mic</span>
-            <span className="text-[12px] mt-0.5">Voice</span>
-          </button>
-          <button
-            onClick={() => setCurrentTab('complaint')}
-            className={`flex-1 flex flex-col items-center justify-center h-full transition-all ${
-              currentTab === 'complaint' ? 'text-primary font-bold' : 'text-secondary font-medium'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[24px]">edit_note</span>
-            <span className="text-[12px] mt-0.5">New Appeal</span>
-          </button>
-          <button
-            onClick={() => setCurrentTab('drafts')}
-            className={`flex-1 flex flex-col items-center justify-center h-full transition-all relative ${
-              currentTab === 'drafts' ? 'text-primary font-bold' : 'text-secondary font-medium'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[24px]">description</span>
-            <span className="text-[12px] mt-0.5">My Appeals</span>
-            {draftsCount > 0 && (
-              <span className="absolute top-2 right-4 px-1.5 py-0.2 text-[10px] rounded-full bg-primary text-white font-bold">
-                {draftsCount}
-              </span>
-            )}
-          </button>
-          <a
-            className="flex-1 flex flex-col items-center justify-center h-full text-secondary hover:text-on-surface font-semibold"
-            href="tel:14434"
-          >
-            <span className="material-symbols-outlined text-[24px]">call</span>
-            <span className="text-[12px] font-medium mt-0.5">14434</span>
-          </a>
-        </div>
-      </nav>
+      {/* Persistent 4-Item Bottom Navigation */}
+      <BottomNavigation
+        currentTab={currentTab}
+        onSelectTab={(tab) => {
+          if (tab === 'profile') {
+            setShowProfileModal(true);
+          } else {
+            setCurrentTab(tab);
+          }
+        }}
+        draftsCount={draftsCount}
+      />
 
-      {/* Optional Onboarding Form Modal */}
+      {/* Onboarding Profile Modal */}
       {showOnboarding && (
         <OnboardingModal
           language={language}
@@ -270,15 +257,6 @@ function MainApp() {
           onSkip={() => setShowOnboarding(false)}
         />
       )}
-
-      <footer className="w-full border-t border-[#E5E4DD] bg-white py-6 px-4 text-center text-xs text-secondary mt-12 hidden sm:block">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span className="font-bold text-on-surface">Awaaz — Har Mazdoor Ki Awaaz</span>
-          <span className="text-[12px] text-secondary">
-            Know Your Rights. Raise Your Voice. • Built for Indian Gig & Daily-Wage Workers
-          </span>
-        </div>
-      </footer>
     </div>
   );
 }
