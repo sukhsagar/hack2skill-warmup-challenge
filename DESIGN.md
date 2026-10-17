@@ -1,9 +1,73 @@
-# Awaaz — Design System & Page Generation Guide
+# Awaaz — Civic Dignity Design System & Page Generation Guide
 
-> **System Version:** 1.0.0 (Mobile-First Sunlight-Readable Legal Aid)  
+> **System Name:** Civic Dignity (Grounded Utilitarian Elegance)  
+> **System Version:** 2.0.0 (Mobile-First Sunlight-Readable Civic & Labor Aid)  
 > **Brand Identity:** *Awaaz — Har Mazdoor Ki Awaaz (हर मज़दूर की आवाज़ / ਹਰ ਮਜ਼ਦੂਰ ਦੀ ਅਵਾਜ਼)*  
-> **Primary Audience:** Delivery riders, cab/auto drivers, logistics & warehouse staff, and daily-wage workers in India.  
+> **Primary Audience:** Delivery riders, cab/auto drivers, domestic staff, logistics & warehouse staff, and daily-wage workers in India.  
 > **Operating Environment:** Bright outdoor sunlight, one-handed smartphone operation, noisy traffic conditions.
+
+```yaml
+name: Civic Dignity
+colors:
+  surface: '#f2fcf2'
+  surface-dim: '#d3ddd3'
+  surface-bright: '#f2fcf2'
+  surface-container-lowest: '#ffffff'
+  surface-container-low: '#ecf6ed'
+  surface-container: '#e6f1e7'
+  surface-container-high: '#e1ebe1'
+  surface-container-highest: '#dbe5dc'
+  on-surface: '#151e18'
+  on-surface-variant: '#3f4944'
+  inverse-surface: '#29332c'
+  inverse-on-surface: '#e9f3ea'
+  outline: '#6f7a73'
+  outline-variant: '#bec9c2'
+  surface-tint: '#096b50'
+  primary: '#00513b'
+  on-primary: '#ffffff'
+  primary-container: '#086b50'
+  on-primary-container: '#95e8c6'
+  inverse-primary: '#84d7b5'
+  secondary: '#57615b'
+  on-secondary: '#ffffff'
+  secondary-container: '#dbe5de'
+  on-secondary-container: '#5d6761'
+  tertiary: '#02513c'
+  on-tertiary: '#ffffff'
+  tertiary-container: '#266953'
+  on-tertiary-container: '#a3e6c9'
+  error: '#ba1a1a'
+  on-error: '#ffffff'
+  error-container: '#ffdad6'
+  on-error-container: '#93000a'
+  primary-fixed: '#a0f3d1'
+  primary-fixed-dim: '#84d7b5'
+  on-primary-fixed: '#002116'
+  on-primary-fixed-variant: '#00513c'
+  background: '#f2fcf2'
+  on-background: '#151e18'
+  surface-variant: '#dbe5dc'
+typography:
+  display: { fontFamily: Inter, fontSize: 36px, fontWeight: '700', lineHeight: 44px, letterSpacing: -0.02em }
+  headline-lg: { fontFamily: Inter, fontSize: 30px, fontWeight: '600', lineHeight: 38px, letterSpacing: -0.015em }
+  headline-lg-mobile: { fontFamily: Inter, fontSize: 24px, fontWeight: '600', lineHeight: 32px, letterSpacing: -0.01em }
+  headline-md: { fontFamily: Inter, fontSize: 22px, fontWeight: '600', lineHeight: 30px, letterSpacing: -0.01em }
+  headline-sm: { fontFamily: Inter, fontSize: 18px, fontWeight: '600', lineHeight: 26px, letterSpacing: -0.005em }
+  body-lg: { fontFamily: Inter, fontSize: 16px, fontWeight: '400', lineHeight: 24px, letterSpacing: 0em }
+  body-md: { fontFamily: Inter, fontSize: 14px, fontWeight: '400', lineHeight: 21px, letterSpacing: 0em }
+  body-sm: { fontFamily: Inter, fontSize: 13px, fontWeight: '400', lineHeight: 18px, letterSpacing: 0.005em }
+  label-lg: { fontFamily: Inter, fontSize: 15px, fontWeight: '600', lineHeight: 20px, letterSpacing: 0.01em }
+  label-md: { fontFamily: Inter, fontSize: 13px, fontWeight: '500', lineHeight: 18px, letterSpacing: 0.01em }
+  label-sm: { fontFamily: Inter, fontSize: 11px, fontWeight: '600', lineHeight: 16px, letterSpacing: 0.04em }
+rounded:
+  sm: 0.125rem
+  DEFAULT: 0.25rem
+  md: 0.375rem
+  lg: 0.5rem
+  xl: 0.75rem
+  full: 9999px
+```
 
 ---
 

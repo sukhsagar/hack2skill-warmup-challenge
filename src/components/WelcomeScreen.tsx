@@ -204,24 +204,13 @@ export function WelcomeScreen({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <a
-              className="h-11 px-3.5 rounded-lg bg-surface-container-lowest border border-[#E5E4DD] text-primary flex items-center gap-1.5 font-bold text-[15px] shadow-xs active:scale-95 transition-all"
-              href="tel:14434"
-              title="National Labor Helpline"
-            >
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping mr-0.5"></span>
-              Helpline
-            </a>
-
-            <button
-              onClick={() => setShowAuthModal(true)}
-              className="h-11 px-3 rounded-lg bg-primary hover:bg-primary-dark text-white font-semibold text-xs flex items-center gap-1 transition-all"
-              title="Sign in with Google"
-            >
-              <span>Sign In</span>
-            </button>
-          </div>
+          <a
+            className="h-11 px-3.5 rounded-lg bg-surface-container-lowest border border-[#E5E4DD] text-primary flex items-center gap-1.5 font-bold text-[15px] shadow-xs active:scale-95 transition-all"
+            href="tel:14434"
+          >
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping mr-0.5"></span>
+            Helpline
+          </a>
         </div>
 
         {/* Prominent Segmented Language Bar */}
