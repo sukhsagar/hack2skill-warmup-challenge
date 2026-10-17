@@ -26,34 +26,31 @@ const DEMO_STORAGE_KEY = 'awaaz_demo_user';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-function getInitialUser(): UserProfile | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    const storedDemo = sessionStorage.getItem(DEMO_STORAGE_KEY);
-    if (storedDemo) {
-      return JSON.parse(storedDemo);
-    }
-  } catch {
-    sessionStorage.removeItem(DEMO_STORAGE_KEY);
-  }
-  return null;
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<UserProfile | null>(getInitialUser);
-  const [loading, setLoading] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return true;
-    if (!isFirebaseConfigured) return false;
-    return !getInitialUser();
-  });
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // 1. Check demo user first from sessionStorage
+    try {
+      const storedDemo = sessionStorage.getItem(DEMO_STORAGE_KEY);
+      if (storedDemo) {
+        const parsed = JSON.parse(storedDemo);
+        setUser(parsed);
+        setLoading(false);
+        return;
+      }
+    } catch {
+      sessionStorage.removeItem(DEMO_STORAGE_KEY);
+    }
+
     if (!isFirebaseConfigured || !auth) {
+      setLoading(false);
       return;
     }
 
-    // Check redirect result first (for mobile redirect flow)
+    // 2. Check redirect result for mobile OAuth
     checkRedirectResult().then((redirectUser) => {
       if (redirectUser) {
         setUser({
@@ -74,8 +71,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           photoURL: fbUser.photoURL,
         });
       } else {
-        const currentDemo = typeof window !== 'undefined' ? sessionStorage.getItem(DEMO_STORAGE_KEY) : null;
-        if (!currentDemo) {
+        try {
+          const currentDemo = sessionStorage.getItem(DEMO_STORAGE_KEY);
+          if (!currentDemo) {
+            setUser(null);
+          }
+        } catch {
           setUser(null);
         }
       }
@@ -127,8 +128,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       photoURL: null,
       isDemoUser: true,
     };
-    if (typeof window !== 'undefined') {
+    try {
       sessionStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(demoProfile));
+    } catch {
+      // ignore
     }
     setUser(demoProfile);
     setLoading(false);
@@ -137,9 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const handleSignOut = async () => {
     setLoading(true);
     try {
-      if (typeof window !== 'undefined') {
-        sessionStorage.removeItem(DEMO_STORAGE_KEY);
-      }
+      sessionStorage.removeItem(DEMO_STORAGE_KEY);
       await logoutUser();
       setUser(null);
     } catch (err: unknown) {
