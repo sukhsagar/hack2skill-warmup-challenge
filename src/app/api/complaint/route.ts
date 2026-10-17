@@ -34,9 +34,10 @@ export async function POST(req: NextRequest) {
 
     const lang: Language = (['en', 'hi', 'pa'].includes(language) ? language : 'en') as Language;
     const { ai, isConfigured } = getGeminiClient();
+    const hasGroq = Boolean(process.env.GROQ_API_KEY && process.env.GROQ_API_KEY.trim() !== '');
 
-    // If Gemini API Key is missing, return labeled reference sample complaint
-    if (!isConfigured || !ai) {
+    // If both Gemini and Groq API keys are missing, return labeled reference sample complaint
+    if (!isConfigured && !hasGroq) {
       const sample = getSampleComplaint(body!);
       return NextResponse.json({
         ...sample,

@@ -10,6 +10,12 @@ export const FALLBACK_MODELS = [
   'gemini-flash-latest',
 ];
 
+export const GROQ_MODELS = [
+  process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
+  'qwen/qwen3.8-27b',
+  'openai/gpt-oss-20b',
+];
+
 export function getGeminiClient(): { ai: GoogleGenerativeAI | null; modelName: string; isConfigured: boolean } {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || apiKey === 'YOUR_GEMINI_API_KEY' || apiKey.trim() === '') {
@@ -22,40 +28,103 @@ export function getGeminiClient(): { ai: GoogleGenerativeAI | null; modelName: s
   };
 }
 
+export async function generateContentWithGroq(
+  systemPrompt: string,
+  userPrompt: string
+): Promise<{ text: string; modelUsed: string }> {
+  const groqKey = process.env.GROQ_API_KEY;
+  if (!groqKey || groqKey.trim() === '') {
+    throw new Error('Groq API Key not configured');
+  }
+
+  let lastError: Error | null = null;
+  for (const model of GROQ_MODELS) {
+    try {
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${groqKey.trim()}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: `${systemPrompt}\n\nIMPORTANT: Output valid JSON only.` },
+            { role: 'user', content: userPrompt },
+          ],
+          response_format: { type: 'json_object' },
+          temperature: 0.2,
+        }),
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Groq HTTP ${response.status}: ${errText.slice(0, 100)}`);
+      }
+
+      const data = await response.json();
+      const content = data?.choices?.[0]?.message?.content;
+      if (content) {
+        return { text: content, modelUsed: `groq/${model}` };
+      }
+    } catch (err: unknown) {
+      const e = err as Error;
+      console.warn(`[Groq AI] Model ${model} failed (${e.message.slice(0, 80)}). Trying next...`);
+      lastError = e;
+    }
+  }
+
+  throw lastError || new Error('All Groq candidate models failed');
+}
+
 export async function generateContentWithFallback(
-  ai: GoogleGenerativeAI,
+  ai: GoogleGenerativeAI | null,
   systemPrompt: string,
   userPrompt: string
 ): Promise<{ text: string; modelUsed: string }> {
   let lastError: Error | null = null;
 
-  for (const modelName of FALLBACK_MODELS) {
-    try {
-      const model = ai.getGenerativeModel({
-        model: modelName,
-        generationConfig: {
-          responseMimeType: 'application/json',
-          temperature: 0.2,
-        },
-      });
+  // 1. Try Gemini Models if configured
+  if (ai) {
+    for (const modelName of FALLBACK_MODELS) {
+      try {
+        const model = ai.getGenerativeModel({
+          model: modelName,
+          generationConfig: {
+            responseMimeType: 'application/json',
+            temperature: 0.2,
+          },
+        });
 
-      const result = await model.generateContent([
-        { text: systemPrompt },
-        { text: userPrompt },
-      ]);
+        const result = await model.generateContent([
+          { text: systemPrompt },
+          { text: userPrompt },
+        ]);
 
-      const text = result.response.text();
-      if (text) {
-        return { text, modelUsed: modelName };
+        const text = result.response.text();
+        if (text) {
+          return { text, modelUsed: modelName };
+        }
+      } catch (err: unknown) {
+        const e = err as Error;
+        console.warn(`[Awaaz AI] Model ${modelName} failed (${e.message.slice(0, 80)}). Trying fallback...`);
+        lastError = e;
       }
-    } catch (err: unknown) {
-      const e = err as Error;
-      console.warn(`[Awaaz AI] Model ${modelName} failed (${e.message.slice(0, 80)}). Trying fallback...`);
-      lastError = e;
     }
   }
 
-  throw lastError || new Error('All candidate Gemini models failed to generate content');
+  // 2. High-Speed Fallback to Groq if Gemini is busy or failing
+  if (process.env.GROQ_API_KEY) {
+    try {
+      console.info('[Awaaz AI] Cascading to Groq alternative inference...');
+      const groqResult = await generateContentWithGroq(systemPrompt, userPrompt);
+      return groqResult;
+    } catch (groqErr) {
+      console.warn('[Awaaz AI] Groq fallback error:', groqErr);
+    }
+  }
+
+  throw lastError || new Error('All candidate AI models (Gemini & Groq) failed to generate content');
 }
 
 export const SAMPLE_RIGHTS_RESPONSES: Record<Language, RightsResponse> = {

@@ -28,8 +28,9 @@ export async function POST(req: NextRequest) {
 
     lang = (['en', 'hi', 'pa'].includes(language) ? language : 'en') as Language;
     const { ai, isConfigured } = getGeminiClient();
+    const hasGroq = Boolean(process.env.GROQ_API_KEY && process.env.GROQ_API_KEY.trim() !== '');
 
-    if (!isConfigured || !ai) {
+    if (!isConfigured && !hasGroq) {
       const sample = SAMPLE_RIGHTS_RESPONSES[lang] || SAMPLE_RIGHTS_RESPONSES.en;
       return NextResponse.json({
         ...sample,
