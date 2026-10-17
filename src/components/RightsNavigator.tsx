@@ -4,12 +4,6 @@ import React, { useState } from 'react';
 import { Language, ProblemCategory, RightsResponse } from '@/types';
 import { translations } from '@/lib/i18n';
 import {
-  BookOpen,
-  Scale,
-  CheckCircle2,
-  ListOrdered,
-  FileCheck2,
-  HelpCircle,
   ExternalLink,
   ShieldAlert,
   RotateCcw,
@@ -95,8 +89,8 @@ export function RightsNavigator({
   return (
     <div className="space-y-6">
       {/* Category Shortcuts */}
-      <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-2xs">
-        <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wider mb-3">
+      <div className="bg-white p-5 rounded-2xl border border-[#E5E4DD] shadow-xs">
+        <h3 className="text-xs font-bold text-secondary uppercase tracking-wider mb-3">
           Select Topic or Problem Category
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
@@ -105,17 +99,17 @@ export function RightsNavigator({
               key={key}
               type="button"
               onClick={() => setSelectedCategory(key)}
-              className={`p-3 rounded-xl border text-left flex flex-col gap-1.5 transition-all text-xs font-semibold ${
+              className={`p-3 rounded-xl border text-left flex flex-col gap-1.5 transition-all text-xs font-bold ${
                 selectedCategory === key
-                  ? 'border-emerald-600 bg-emerald-50 text-emerald-900 shadow-2xs'
-                  : 'border-stone-200 hover:border-stone-300 bg-white text-stone-700'
+                  ? 'border-primary bg-primary-light text-primary shadow-xs'
+                  : 'border-[#E5E4DD] hover:border-primary/40 bg-white text-secondary'
               }`}
             >
               <div
                 className={`w-7 h-7 rounded-lg flex items-center justify-center ${
                   selectedCategory === key
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-stone-100 text-stone-600'
+                    ? 'bg-primary text-white'
+                    : 'bg-[#F2F1EA] text-secondary'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -127,10 +121,10 @@ export function RightsNavigator({
       </div>
 
       {/* Question Input Box */}
-      <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-2xs space-y-4">
+      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#E5E4DD] shadow-xs space-y-4">
         <div>
-          <h2 className="text-lg font-bold text-stone-900">{t.rightsHeading}</h2>
-          <p className="text-xs text-stone-500 mt-0.5">{t.rightsSubtitle}</p>
+          <h2 className="text-xl font-bold text-on-surface">{t.rightsHeading}</h2>
+          <p className="text-sm text-secondary mt-0.5">{t.rightsSubtitle}</p>
         </div>
 
         <div className="relative">
@@ -139,13 +133,13 @@ export function RightsNavigator({
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             placeholder={t.rightsInputPlaceholder}
-            className="w-full p-3.5 text-sm rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-stone-800 placeholder:text-stone-400"
+            className="w-full p-3.5 text-base rounded-xl border border-[#E5E4DD] focus:border-primary bg-[#FAF9F5] focus:bg-white focus:outline-none text-on-surface placeholder:text-outline font-medium"
           />
         </div>
 
         {/* Suggested Quick Questions */}
         <div>
-          <span className="text-xs font-bold text-stone-500 uppercase tracking-wider block mb-2">
+          <span className="text-xs font-bold text-secondary uppercase tracking-wider block mb-2">
             Suggested Questions:
           </span>
           <div className="flex flex-wrap gap-2">
@@ -154,7 +148,7 @@ export function RightsNavigator({
                 key={idx}
                 type="button"
                 onClick={() => handleSelectSuggested(sq)}
-                className="text-xs px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-emerald-50 hover:text-emerald-800 border border-stone-200 text-stone-700 transition-colors text-left"
+                className="text-xs px-3 py-1.5 rounded-lg bg-[#F2F1EA] hover:bg-primary-light hover:text-primary border border-[#E5E4DD] text-secondary font-medium transition-colors text-left"
               >
                 {sq}
               </button>
@@ -163,14 +157,14 @@ export function RightsNavigator({
         </div>
 
         <div className="flex items-center justify-between pt-2">
-          <span className="text-xs text-stone-400">
-            Powered by Gemini • Confidential & Local
+          <span className="text-xs text-secondary">
+            Backed by Indian Labor Law & Gemini
           </span>
           <button
             type="button"
             disabled={loading || !question.trim()}
             onClick={() => handleAsk()}
-            className="px-6 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm shadow-xs flex items-center gap-2 transition-all disabled:opacity-50"
+            className="px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-sm shadow-xs flex items-center gap-2 transition-all disabled:opacity-50"
           >
             {loading ? (
               <>
@@ -187,11 +181,11 @@ export function RightsNavigator({
         </div>
 
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center justify-between">
+          <div className="p-3 bg-error-container border border-error rounded-xl text-xs text-error font-medium flex items-center justify-between">
             <span>{error}</span>
             <button
               onClick={() => handleAsk()}
-              className="font-bold underline ml-2 hover:text-red-900"
+              className="font-bold underline ml-2 hover:opacity-80"
             >
               Retry
             </button>
@@ -201,23 +195,23 @@ export function RightsNavigator({
 
       {/* Response Card */}
       {response && (
-        <div className="bg-white rounded-2xl border border-emerald-200/80 shadow-sm p-6 space-y-6">
+        <div className="bg-white rounded-2xl border border-primary/20 shadow-sm p-6 space-y-6">
           {response.isSampleResponse && (
-            <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center gap-2">
+            <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center gap-2 font-medium">
               <ShieldAlert className="w-4 h-4 text-amber-700 shrink-0" />
               <span>
-                Demonstration Reference Template (Configure <code>GEMINI_API_KEY</code> in <code>.env.local</code> for live generative AI responses).
+                Demonstration Reference Guide (Active fallback model enabled).
               </span>
             </div>
           )}
 
           {/* Plain Explanation */}
           <div>
-            <div className="flex items-center gap-2 text-stone-900 font-bold text-base mb-2">
-              <BookOpen className="w-5 h-5 text-emerald-700" />
+            <div className="flex items-center gap-2 text-on-surface font-bold text-lg mb-2">
+              <span className="material-symbols-outlined text-primary text-[22px]">menu_book</span>
               <span>{t.explanationTitle}</span>
             </div>
-            <div className="p-4 rounded-xl bg-stone-50 border border-stone-200/70 text-sm text-stone-800 leading-relaxed">
+            <div className="p-4 rounded-xl bg-[#FAF9F5] border border-[#E5E4DD] text-base text-on-surface leading-relaxed font-medium">
               {response.plainExplanation}
             </div>
           </div>
@@ -225,17 +219,17 @@ export function RightsNavigator({
           {/* Protections & Frameworks */}
           {response.relevantProtections?.length > 0 && (
             <div>
-              <div className="flex items-center gap-2 text-stone-900 font-bold text-base mb-2">
-                <Scale className="w-5 h-5 text-emerald-700" />
+              <div className="flex items-center gap-2 text-on-surface font-bold text-lg mb-2">
+                <span className="material-symbols-outlined text-primary text-[22px]">gavel</span>
                 <span>{t.protectionsTitle}</span>
               </div>
               <ul className="space-y-2">
                 {response.relevantProtections.map((p, idx) => (
                   <li
                     key={idx}
-                    className="flex items-start gap-2.5 text-xs sm:text-sm text-stone-700 p-2.5 rounded-lg bg-emerald-50/50 border border-emerald-100"
+                    className="flex items-start gap-2.5 text-sm sm:text-base text-on-surface p-3 rounded-xl bg-primary-light/40 border border-primary/20 font-medium"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
+                    <span className="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">check_circle</span>
                     <span>{p}</span>
                   </li>
                 ))}
@@ -246,17 +240,17 @@ export function RightsNavigator({
           {/* Practical Next Steps */}
           {response.practicalNextSteps?.length > 0 && (
             <div>
-              <div className="flex items-center gap-2 text-stone-900 font-bold text-base mb-2">
-                <ListOrdered className="w-5 h-5 text-emerald-700" />
+              <div className="flex items-center gap-2 text-on-surface font-bold text-lg mb-2">
+                <span className="material-symbols-outlined text-primary text-[22px]">format_list_numbered</span>
                 <span>{t.nextStepsTitle}</span>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {response.practicalNextSteps.map((step, idx) => (
                   <div
                     key={idx}
-                    className="flex items-start gap-3 p-3 rounded-xl bg-white border border-stone-200 text-xs sm:text-sm text-stone-800 shadow-2xs"
+                    className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-[#E5E4DD] text-sm sm:text-base text-on-surface shadow-xs font-medium"
                   >
-                    <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    <div className="w-6 h-6 rounded-full bg-primary-light text-primary font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
                       {idx + 1}
                     </div>
                     <span>{step}</span>
@@ -269,17 +263,17 @@ export function RightsNavigator({
           {/* Evidence Checklist */}
           {response.documentsToCollect?.length > 0 && (
             <div>
-              <div className="flex items-center gap-2 text-stone-900 font-bold text-base mb-2">
-                <FileCheck2 className="w-5 h-5 text-emerald-700" />
+              <div className="flex items-center gap-2 text-on-surface font-bold text-lg mb-2">
+                <span className="material-symbols-outlined text-primary text-[22px]">fact_check</span>
                 <span>{t.evidenceTitle}</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {response.documentsToCollect.map((doc, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-2 p-2.5 rounded-lg bg-stone-50 border border-stone-200 text-xs text-stone-700"
+                    className="flex items-center gap-2 p-3 rounded-xl bg-[#FAF9F5] border border-[#E5E4DD] text-sm text-secondary font-medium"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0" />
+                    <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
                     <span>{doc}</span>
                   </div>
                 ))}
@@ -287,26 +281,11 @@ export function RightsNavigator({
             </div>
           )}
 
-          {/* Clarifying Questions if any */}
-          {response.clarifyingQuestions && response.clarifyingQuestions.length > 0 && (
-            <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200">
-              <div className="flex items-center gap-2 text-amber-900 font-semibold text-xs mb-1">
-                <HelpCircle className="w-4 h-4 text-amber-700" />
-                <span>{t.clarificationsTitle}</span>
-              </div>
-              <ul className="list-disc list-inside text-xs text-amber-800 space-y-1">
-                {response.clarifyingQuestions.map((cq, idx) => (
-                  <li key={idx}>{cq}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
           {/* Official Resources & Helplines */}
           {response.verifiedResources && response.verifiedResources.length > 0 && (
             <div>
-              <div className="flex items-center gap-2 text-stone-900 font-bold text-base mb-2">
-                <ExternalLink className="w-5 h-5 text-emerald-700" />
+              <div className="flex items-center gap-2 text-on-surface font-bold text-lg mb-2">
+                <span className="material-symbols-outlined text-primary text-[22px]">link</span>
                 <span>{t.officialResourcesTitle}</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -316,20 +295,20 @@ export function RightsNavigator({
                     href={res.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 rounded-xl border border-stone-200 hover:border-emerald-500 hover:bg-emerald-50/20 transition-all text-left flex flex-col justify-between group"
+                    className="p-3.5 rounded-xl border border-[#E5E4DD] hover:border-primary hover:bg-primary-light/20 transition-all text-left flex flex-col justify-between group"
                   >
                     <div>
-                      <div className="text-xs font-bold text-stone-900 group-hover:text-emerald-800 flex items-center justify-between">
+                      <div className="text-sm font-bold text-on-surface group-hover:text-primary flex items-center justify-between">
                         <span>{res.name}</span>
-                        <ExternalLink className="w-3.5 h-3.5 text-stone-400 group-hover:text-emerald-700" />
+                        <ExternalLink className="w-3.5 h-3.5 text-secondary group-hover:text-primary" />
                       </div>
-                      <p className="text-[11px] text-stone-500 mt-1 line-clamp-2">
+                      <p className="text-xs text-secondary mt-1 line-clamp-2">
                         {res.description}
                       </p>
                     </div>
                     {res.helpline && (
-                      <div className="mt-2 pt-2 border-t border-stone-100 flex items-center gap-1.5 text-[11px] font-semibold text-emerald-800">
-                        <PhoneCall className="w-3 h-3 text-emerald-600" />
+                      <div className="mt-2.5 pt-2 border-t border-[#E5E4DD] flex items-center gap-1.5 text-xs font-bold text-primary">
+                        <PhoneCall className="w-3 h-3 text-primary" />
                         <span>Helpline: {res.helpline}</span>
                       </div>
                     )}
@@ -340,26 +319,27 @@ export function RightsNavigator({
           )}
 
           {/* Action to Turn Into Formal Complaint */}
-          <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="p-4 sm:p-5 rounded-2xl bg-primary-light border border-primary/30 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div>
-              <h4 className="text-sm font-bold text-emerald-950">
+              <h4 className="text-base font-bold text-on-surface">
                 Ready to take action on this issue?
               </h4>
-              <p className="text-xs text-emerald-800">
-                Turn this guidance into a professional grievance letter addressed to the platform&apos;s Grievance Redressal Officer.
+              <p className="text-sm text-secondary font-medium">
+                Turn this guidance into a professional grievance notice addressed to the platform&apos;s Grievance Redressal Officer.
               </p>
             </div>
             <button
               onClick={() => onDraftComplaintFromIssue(question, selectedCategory)}
-              className="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs shadow-xs flex items-center gap-2 shrink-0 transition-all"
+              className="px-5 py-3 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-sm shadow-xs flex items-center gap-2 shrink-0 transition-all"
             >
               <span>{t.turnIntoComplaintBtn}</span>
+              <span className="font-bold">→</span>
             </button>
           </div>
 
           {/* Legal Disclaimer */}
-          <div className="pt-3 border-t border-stone-100 text-[11px] text-stone-500 leading-relaxed">
-            <span className="font-semibold text-stone-700">{t.legalDisclaimerTitle}: </span>
+          <div className="pt-3 border-t border-[#E5E4DD] text-xs text-secondary leading-relaxed">
+            <span className="font-bold text-on-surface">{t.legalDisclaimerTitle}: </span>
             {response.disclaimer || t.legalDisclaimerText}
           </div>
         </div>

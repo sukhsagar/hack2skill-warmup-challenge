@@ -5,7 +5,6 @@ import { useAuth } from '@/context/AuthContext';
 import { ComplaintDraft, Language } from '@/types';
 import { translations } from '@/lib/i18n';
 import {
-  FileText,
   Copy,
   Check,
   Trash2,
@@ -82,13 +81,13 @@ export function DraftsList({
   return (
     <div className="space-y-6">
       {/* Title & Privacy Badge */}
-      <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-2xs">
+      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#E5E4DD] shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-bold text-stone-900">{t.myDraftsTitle}</h2>
-            <p className="text-xs text-stone-500 mt-0.5">{t.draftsDisclaimer}</p>
+            <h2 className="text-xl font-bold text-on-surface">{t.myDraftsTitle}</h2>
+            <p className="text-sm text-secondary mt-0.5">{t.draftsDisclaimer}</p>
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-light border border-primary/20 text-primary text-xs font-bold">
             <Shield className="w-3.5 h-3.5" />
             <span>Private & Stored on Your Device Only</span>
           </div>
@@ -96,12 +95,12 @@ export function DraftsList({
       </div>
 
       {drafts.length === 0 ? (
-        <div className="bg-white p-12 rounded-2xl border border-stone-200 shadow-2xs text-center space-y-3">
-          <div className="w-12 h-12 rounded-full bg-stone-100 text-stone-400 mx-auto flex items-center justify-center">
-            <FileText className="w-6 h-6" />
+        <div className="bg-white p-12 rounded-2xl border border-[#E5E4DD] shadow-xs text-center space-y-3">
+          <div className="w-12 h-12 rounded-full bg-[#FAF9F5] text-secondary mx-auto flex items-center justify-center border border-[#E5E4DD]">
+            <span className="material-symbols-outlined text-[26px]">description</span>
           </div>
-          <h3 className="text-sm font-bold text-stone-800">{t.noDraftsMessage}</h3>
-          <p className="text-xs text-stone-500 max-w-md mx-auto">
+          <h3 className="text-base font-bold text-on-surface">{t.noDraftsMessage}</h3>
+          <p className="text-sm text-secondary max-w-md mx-auto font-medium">
             When you create or save a complaint draft in the Complaint Builder, it will be saved here securely in your browser storage.
           </p>
         </div>
@@ -111,14 +110,14 @@ export function DraftsList({
             <div
               key={draft.id}
               onClick={() => onEditDraft(draft)}
-              className="p-5 rounded-2xl bg-white border border-stone-200 hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group space-y-4"
+              className="p-5 rounded-2xl bg-white border border-[#E5E4DD] hover:border-primary hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group space-y-4"
             >
               <div>
                 <div className="flex items-center justify-between gap-2 mb-2">
-                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-primary-light text-primary border border-primary/20">
                     {draft.platform || 'General'}
                   </span>
-                  <div className="flex items-center gap-1 text-[11px] text-stone-400">
+                  <div className="flex items-center gap-1 text-[12px] text-secondary">
                     <Clock className="w-3 h-3" />
                     <span>
                       {new Date(draft.updatedAt || draft.createdAt).toLocaleDateString()}
@@ -126,17 +125,17 @@ export function DraftsList({
                   </div>
                 </div>
 
-                <h3 className="text-sm font-bold text-stone-900 line-clamp-2 group-hover:text-emerald-800 transition-colors">
+                <h3 className="text-base font-bold text-on-surface line-clamp-2 group-hover:text-primary transition-colors">
                   {draft.subject}
                 </h3>
 
-                <p className="text-xs text-stone-600 line-clamp-3 mt-2 font-mono bg-stone-50 p-2 rounded-lg border border-stone-100">
+                <p className="text-xs text-secondary line-clamp-3 mt-2 font-mono bg-[#FAF9F5] p-2.5 rounded-xl border border-[#E5E4DD]">
                   {draft.complaintBody}
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs">
-                <span className="text-[11px] font-semibold text-emerald-700 flex items-center gap-1">
+              <div className="pt-3 border-t border-[#E5E4DD] flex items-center justify-between text-xs">
+                <span className="text-xs font-bold text-primary flex items-center gap-1">
                   <Edit3 className="w-3.5 h-3.5" />
                   <span>Click to Edit & Review</span>
                 </span>
@@ -145,11 +144,11 @@ export function DraftsList({
                   <button
                     type="button"
                     onClick={(e) => handleCopy(draft, e)}
-                    className="p-2 rounded-lg bg-stone-100 hover:bg-emerald-50 hover:text-emerald-800 text-stone-600 transition-colors"
+                    className="p-2 rounded-lg bg-[#FAF9F5] hover:bg-primary-light hover:text-primary text-secondary transition-colors border border-[#E5E4DD]"
                     title={t.copyBtn}
                   >
                     {copiedId === draft.id ? (
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <Check className="w-3.5 h-3.5 text-primary" />
                     ) : (
                       <Copy className="w-3.5 h-3.5" />
                     )}
@@ -158,7 +157,7 @@ export function DraftsList({
                   <button
                     type="button"
                     onClick={(e) => handleDelete(draft.id, e)}
-                    className="p-2 rounded-lg bg-stone-100 hover:bg-red-50 hover:text-red-700 text-stone-600 transition-colors"
+                    className="p-2 rounded-lg bg-[#FAF9F5] hover:bg-error-container/30 hover:text-error text-secondary transition-colors border border-[#E5E4DD]"
                     title={t.deleteDraftBtn}
                   >
                     <Trash2 className="w-3.5 h-3.5" />

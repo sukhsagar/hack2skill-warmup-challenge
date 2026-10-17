@@ -12,8 +12,6 @@ import {
   Trash2,
   BookmarkCheck,
   AlertCircle,
-  ListChecks,
-  Compass,
   ArrowRight,
   Sparkles,
 } from 'lucide-react';
@@ -265,11 +263,10 @@ export function ComplaintBuilder({
       setTimeout(() => setCopied(false), 3000);
     } catch (err) {
       console.error('Copy failed:', err);
-      alert('Could not copy automatically. Please select the text manually and press Ctrl+C / Cmd+C.');
+      alert('Could not copy automatically. Please select the text manually.');
     }
   };
 
-  // Sample scenarios for rapid evaluator demonstration
   const handleLoadSampleScenario = (scenario: 'payout' | 'penalty' | 'suspension') => {
     if (scenario === 'payout') {
       setFormData({
@@ -316,34 +313,34 @@ export function ComplaintBuilder({
   return (
     <div className="space-y-6">
       {/* Header and Step Indicator */}
-      <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-2xs">
+      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#E5E4DD] shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-bold text-stone-900">{t.complaintHeading}</h2>
-            <p className="text-xs text-stone-500 mt-0.5">{t.complaintSubtitle}</p>
+            <h2 className="text-xl font-bold text-on-surface">{t.complaintHeading}</h2>
+            <p className="text-sm text-secondary mt-0.5">{t.complaintSubtitle}</p>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => setStep('form')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
                 step === 'form'
-                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                  : 'bg-stone-100 text-stone-600 hover:text-stone-900'
+                  ? 'bg-primary text-white'
+                  : 'bg-[#F2F1EA] text-secondary hover:text-on-surface'
               }`}
             >
               1. Incident Details
             </button>
-            <ArrowRight className="w-3.5 h-3.5 text-stone-400" />
+            <ArrowRight className="w-3.5 h-3.5 text-secondary" />
             <button
               onClick={() => {
                 if (complaintBody) setStep('preview');
               }}
               disabled={!complaintBody}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-40 ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors disabled:opacity-40 ${
                 step === 'preview'
-                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                  : 'bg-stone-100 text-stone-600 hover:text-stone-900'
+                  ? 'bg-primary text-white'
+                  : 'bg-[#F2F1EA] text-secondary hover:text-on-surface'
               }`}
             >
               2. Review & Copy
@@ -354,32 +351,32 @@ export function ComplaintBuilder({
 
       {/* STEP 1: FORM INPUT */}
       {step === 'form' && (
-        <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-2xs space-y-6">
+        <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#E5E4DD] shadow-xs space-y-6">
           {/* Quick Demo Scenarios */}
-          <div className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200">
-            <span className="text-xs font-bold text-emerald-900 flex items-center gap-1.5 mb-2">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
+          <div className="p-4 rounded-xl bg-primary-light/60 border border-primary/20">
+            <span className="text-xs font-bold text-primary flex items-center gap-1.5 mb-2.5">
+              <Sparkles className="w-4 h-4 text-primary" />
               1-Click Demo Scenarios (Pre-fill Form):
             </span>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => handleLoadSampleScenario('payout')}
-                className="text-xs px-3 py-1.5 rounded-lg bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-medium transition-all"
+                className="text-xs px-3 py-1.5 rounded-lg bg-white hover:bg-primary hover:text-white text-on-surface border border-[#E5E4DD] font-semibold transition-all shadow-xs"
               >
                 Swiggy Delayed Payout (₹2,450)
               </button>
               <button
                 type="button"
                 onClick={() => handleLoadSampleScenario('penalty')}
-                className="text-xs px-3 py-1.5 rounded-lg bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-medium transition-all"
+                className="text-xs px-3 py-1.5 rounded-lg bg-white hover:bg-primary hover:text-white text-on-surface border border-[#E5E4DD] font-semibold transition-all shadow-xs"
               >
                 Zomato Cancellation Penalty (₹500)
               </button>
               <button
                 type="button"
                 onClick={() => handleLoadSampleScenario('suspension')}
-                className="text-xs px-3 py-1.5 rounded-lg bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-medium transition-all"
+                className="text-xs px-3 py-1.5 rounded-lg bg-white hover:bg-primary hover:text-white text-on-surface border border-[#E5E4DD] font-semibold transition-all shadow-xs"
               >
                 Uber ID Deactivation Appeal
               </button>
@@ -389,7 +386,7 @@ export function ComplaintBuilder({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Category */}
             <div>
-              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wide mb-1.5">
+              <label className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
                 {t.categoryLabel} *
               </label>
               <select
@@ -397,7 +394,7 @@ export function ComplaintBuilder({
                 onChange={(e) =>
                   setFormData({ ...formData, category: e.target.value as ProblemCategory })
                 }
-                className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 text-stone-800"
+                className="w-full px-3.5 py-2.5 text-base rounded-xl border border-[#E5E4DD] bg-[#FAF9F5] focus:bg-white focus:border-primary focus:outline-none text-on-surface font-medium"
               >
                 {Object.entries(t.categories).map(([k, label]) => (
                   <option key={k} value={k}>
@@ -409,13 +406,13 @@ export function ComplaintBuilder({
 
             {/* Platform */}
             <div>
-              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wide mb-1.5">
+              <label className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
                 {t.platformLabel} *
               </label>
               <select
                 value={formData.platform}
                 onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
-                className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 text-stone-800"
+                className="w-full px-3.5 py-2.5 text-base rounded-xl border border-[#E5E4DD] bg-[#FAF9F5] focus:bg-white focus:border-primary focus:outline-none text-on-surface font-medium"
               >
                 {PLATFORMS.map((p) => (
                   <option key={p} value={p}>
@@ -428,25 +425,25 @@ export function ComplaintBuilder({
 
           {/* Incident Description */}
           <div>
-            <label className="block text-xs font-bold text-stone-700 uppercase tracking-wide mb-1.5">
+            <label className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
               {t.incidentDescLabel} *
             </label>
             <textarea
-              rows={5}
+              rows={4}
               value={formData.incidentDescription}
               onChange={(e) => setFormData({ ...formData, incidentDescription: e.target.value })}
               placeholder={t.incidentDescPlaceholder}
-              className="w-full p-3.5 text-sm rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-stone-800 placeholder:text-stone-400"
+              className="w-full p-3.5 text-base rounded-xl border border-[#E5E4DD] bg-[#FAF9F5] focus:bg-white focus:border-primary focus:outline-none text-on-surface placeholder:text-outline font-medium"
             />
-            <p className="text-[11px] text-stone-400 mt-1">
-              Do not include confidential passwords, bank PINs, or Aadhaar numbers.
+            <p className="text-[12px] text-secondary mt-1">
+              Do not include confidential passwords, bank PINs, or OTPs.
             </p>
           </div>
 
           {/* Optional specific fields */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wide mb-1.5">
+              <label className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
                 {t.incidentDateLabel}
               </label>
               <input
@@ -454,12 +451,12 @@ export function ComplaintBuilder({
                 value={formData.incidentDate || ''}
                 onChange={(e) => setFormData({ ...formData, incidentDate: e.target.value })}
                 placeholder="e.g. 14 Oct 2026"
-                className="w-full px-3.5 py-2 text-sm rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-stone-800"
+                className="w-full px-3.5 py-2 text-base rounded-xl border border-[#E5E4DD] bg-[#FAF9F5] focus:bg-white focus:border-primary focus:outline-none text-on-surface font-medium"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wide mb-1.5">
+              <label className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
                 {t.disputedAmountLabel}
               </label>
               <input
@@ -467,12 +464,12 @@ export function ComplaintBuilder({
                 value={formData.disputedAmount || ''}
                 onChange={(e) => setFormData({ ...formData, disputedAmount: e.target.value })}
                 placeholder="e.g. 1850"
-                className="w-full px-3.5 py-2 text-sm rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-stone-800"
+                className="w-full px-3.5 py-2 text-base rounded-xl border border-[#E5E4DD] bg-[#FAF9F5] focus:bg-white focus:border-primary focus:outline-none text-on-surface font-medium"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wide mb-1.5">
+              <label className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
                 {t.workerIdLabel}
               </label>
               <input
@@ -480,14 +477,14 @@ export function ComplaintBuilder({
                 value={formData.workerIdentifier || ''}
                 onChange={(e) => setFormData({ ...formData, workerIdentifier: e.target.value })}
                 placeholder="e.g. ZOM-8921"
-                className="w-full px-3.5 py-2 text-sm rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-stone-800"
+                className="w-full px-3.5 py-2 text-base rounded-xl border border-[#E5E4DD] bg-[#FAF9F5] focus:bg-white focus:border-primary focus:outline-none text-on-surface font-medium"
               />
             </div>
           </div>
 
           {/* Desired Resolution */}
           <div>
-            <label className="block text-xs font-bold text-stone-700 uppercase tracking-wide mb-1.5">
+            <label className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
               {t.desiredResolutionLabel}
             </label>
             <input
@@ -495,22 +492,22 @@ export function ComplaintBuilder({
               value={formData.desiredResolution || ''}
               onChange={(e) => setFormData({ ...formData, desiredResolution: e.target.value })}
               placeholder={t.desiredResolutionPlaceholder}
-              className="w-full px-3.5 py-2 text-sm rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-stone-800"
+              className="w-full px-3.5 py-2 text-base rounded-xl border border-[#E5E4DD] bg-[#FAF9F5] focus:bg-white focus:border-primary focus:outline-none text-on-surface font-medium"
             />
           </div>
 
           {/* Output Language Selector for the complaint */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-stone-100">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-[#E5E4DD]">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-stone-600">Complaint Language:</span>
-              <div className="inline-flex rounded-lg border border-stone-200 bg-stone-100 p-0.5">
+              <span className="text-xs font-bold text-secondary">Complaint Language:</span>
+              <div className="inline-flex rounded-lg border border-[#E5E4DD] bg-[#FAF9F5] p-0.5">
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, language: 'en' })}
-                  className={`px-2.5 py-1 text-xs font-semibold rounded-md ${
+                  className={`px-3 py-1 text-xs font-bold rounded-md ${
                     formData.language === 'en'
-                      ? 'bg-white text-emerald-800 shadow-xs'
-                      : 'text-stone-600'
+                      ? 'bg-white text-primary shadow-xs'
+                      : 'text-secondary'
                   }`}
                 >
                   English
@@ -518,10 +515,10 @@ export function ComplaintBuilder({
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, language: 'hi' })}
-                  className={`px-2.5 py-1 text-xs font-semibold rounded-md ${
+                  className={`px-3 py-1 text-xs font-bold rounded-md ${
                     formData.language === 'hi'
-                      ? 'bg-white text-emerald-800 shadow-xs'
-                      : 'text-stone-600'
+                      ? 'bg-white text-primary shadow-xs'
+                      : 'text-secondary'
                   }`}
                 >
                   हिंदी
@@ -529,10 +526,10 @@ export function ComplaintBuilder({
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, language: 'pa' })}
-                  className={`px-2.5 py-1 text-xs font-semibold rounded-md ${
+                  className={`px-3 py-1 text-xs font-bold rounded-md ${
                     formData.language === 'pa'
-                      ? 'bg-white text-emerald-800 shadow-xs'
-                      : 'text-stone-600'
+                      ? 'bg-white text-primary shadow-xs'
+                      : 'text-secondary'
                   }`}
                 >
                   ਪੰਜਾਬੀ
@@ -544,7 +541,7 @@ export function ComplaintBuilder({
               type="button"
               disabled={loading || !formData.incidentDescription.trim()}
               onClick={() => handleGenerate()}
-              className="px-6 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm shadow-xs flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+              className="px-6 py-3 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-base shadow-xs flex items-center justify-center gap-2 transition-all disabled:opacity-50"
             >
               {loading ? (
                 <>
@@ -561,7 +558,7 @@ export function ComplaintBuilder({
           </div>
 
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700">
+            <div className="p-3 bg-error-container border border-error rounded-xl text-xs text-error font-medium">
               {error}
             </div>
           )}
@@ -572,13 +569,13 @@ export function ComplaintBuilder({
       {step === 'preview' && (
         <div className="space-y-6">
           {/* Top Actions Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-white rounded-2xl border border-stone-200 shadow-2xs">
+          <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-white rounded-2xl border border-[#E5E4DD] shadow-xs">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+              <span className="text-xs font-bold px-3 py-1 rounded-full bg-primary-light text-primary border border-primary/20">
                 {formData.platform} • {t.categories[formData.category]}
               </span>
               {draftSaved && (
-                <span className="text-xs text-emerald-700 font-semibold flex items-center gap-1">
+                <span className="text-xs text-primary font-bold flex items-center gap-1">
                   <BookmarkCheck className="w-3.5 h-3.5" />
                   <span>{t.savedDraftBtn}</span>
                 </span>
@@ -589,7 +586,7 @@ export function ComplaintBuilder({
               <button
                 type="button"
                 onClick={handleCopy}
-                className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs shadow-xs flex items-center gap-1.5 transition-all"
+                className="px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-xs flex items-center gap-1.5 transition-all"
               >
                 {copied ? (
                   <>
@@ -607,7 +604,7 @@ export function ComplaintBuilder({
               <button
                 type="button"
                 onClick={handleManualSave}
-                className="px-3.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold text-xs flex items-center gap-1.5 transition-all"
+                className="px-3.5 py-2 rounded-xl bg-[#FAF9F5] hover:bg-[#F2F1EA] text-on-surface font-semibold text-xs border border-[#E5E4DD] flex items-center gap-1.5 transition-all"
                 title="Save changes to local drafts"
               >
                 <BookmarkCheck className="w-4 h-4" />
@@ -618,7 +615,7 @@ export function ComplaintBuilder({
                 type="button"
                 onClick={handleGenerate}
                 disabled={loading}
-                className="px-3 py-2 rounded-xl border border-stone-300 hover:bg-stone-50 text-stone-700 font-semibold text-xs flex items-center gap-1 transition-all disabled:opacity-50"
+                className="px-3 py-2 rounded-xl border border-[#E5E4DD] hover:bg-[#FAF9F5] text-secondary font-semibold text-xs flex items-center gap-1 transition-all disabled:opacity-50"
                 title={t.regenerateBtn}
               >
                 <RotateCcw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -628,7 +625,7 @@ export function ComplaintBuilder({
               <button
                 type="button"
                 onClick={handleDeleteDraft}
-                className="p-2 rounded-xl border border-red-200 hover:bg-red-50 text-red-600 transition-all"
+                className="p-2 rounded-xl border border-error/20 hover:bg-error-container/30 text-error transition-all"
                 title={t.deleteDraftBtn}
               >
                 <Trash2 className="w-4 h-4" />
@@ -637,7 +634,7 @@ export function ComplaintBuilder({
               <button
                 type="button"
                 onClick={handleStartNew}
-                className="px-3 py-2 rounded-xl border border-stone-200 hover:bg-stone-100 text-stone-700 font-semibold text-xs flex items-center gap-1 transition-all"
+                className="px-3 py-2 rounded-xl border border-[#E5E4DD] hover:bg-[#FAF9F5] text-on-surface font-semibold text-xs flex items-center gap-1 transition-all"
               >
                 <PlusCircle className="w-3.5 h-3.5" />
                 <span>{t.startNewBtn}</span>
@@ -646,67 +643,67 @@ export function ComplaintBuilder({
           </div>
 
           {isSampleDraft && (
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-center gap-2">
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-center gap-2 font-medium">
               <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
               <span>
-                Sample Complaint Template (Add your <code>GEMINI_API_KEY</code> in <code>.env.local</code> for AI-customized complaints).
+                Standard Statutory Notice Template (Customized with provided incident facts).
               </span>
             </div>
           )}
 
           {/* Document Letterhead Card */}
-          <div className="bg-white rounded-2xl border border-stone-300/80 shadow-sm p-6 sm:p-8 space-y-6 font-sans">
-            <div className="border-b border-stone-200 pb-4 flex items-center justify-between">
+          <div className="bg-white rounded-2xl border border-[#E5E4DD] shadow-sm p-6 sm:p-8 space-y-6 font-sans">
+            <div className="border-b border-[#E5E4DD] pb-4 flex items-center justify-between">
               <div>
-                <span className="text-xs uppercase tracking-widest text-emerald-800 font-bold block">
-                  Formal Grievance Notice
+                <span className="text-xs uppercase tracking-widest text-primary font-bold block">
+                  Official Grievance Notice
                 </span>
-                <span className="text-[11px] text-stone-400">
+                <span className="text-xs text-secondary">
                   Editable Document Draft • Awaaz — Har Mazdoor Ki Awaaz
                 </span>
               </div>
-              <span className="text-xs px-2.5 py-1 rounded-md bg-stone-100 text-stone-600 font-medium">
+              <span className="text-xs px-2.5 py-1 rounded-md bg-[#FAF9F5] text-secondary font-semibold border border-[#E5E4DD]">
                 {formData.language.toUpperCase()}
               </span>
             </div>
 
             {/* Subject Line */}
             <div>
-              <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-bold text-secondary uppercase tracking-wider mb-1">
                 Subject
               </label>
               <input
                 type="text"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                className="w-full p-2.5 text-sm font-semibold text-stone-900 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full p-3 text-base font-bold text-on-surface bg-[#FAF9F5] border border-[#E5E4DD] rounded-xl focus:border-primary focus:bg-white focus:outline-none"
               />
             </div>
 
             {/* Editable Complaint Body */}
             <div>
-              <label className="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">
-                Complaint Letter Body (You can edit text directly before copying)
+              <label className="block text-xs font-bold text-secondary uppercase tracking-wider mb-1">
+                Notice Body (You can edit text directly before copying)
               </label>
               <textarea
-                rows={16}
+                rows={14}
                 value={complaintBody}
                 onChange={(e) => setComplaintBody(e.target.value)}
-                className="w-full p-4 text-xs sm:text-sm font-normal text-stone-800 bg-stone-50/70 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 leading-relaxed font-mono whitespace-pre-wrap"
+                className="w-full p-4 text-sm font-normal text-on-surface bg-[#FAF9F5] border border-[#E5E4DD] rounded-xl focus:border-primary focus:bg-white focus:outline-none leading-relaxed font-mono whitespace-pre-wrap"
               />
             </div>
 
             {/* Evidence Checklist */}
             {evidenceChecklist.length > 0 && (
-              <div className="p-4 rounded-xl bg-stone-50 border border-stone-200">
-                <div className="flex items-center gap-2 text-xs font-bold text-stone-800 uppercase tracking-wide mb-2">
-                  <ListChecks className="w-4 h-4 text-emerald-700" />
+              <div className="p-4 rounded-xl bg-[#FAF9F5] border border-[#E5E4DD]">
+                <div className="flex items-center gap-2 text-xs font-bold text-on-surface uppercase tracking-wide mb-2">
+                  <span className="material-symbols-outlined text-primary text-[20px]">fact_check</span>
                   <span>Recommended Attachments & Evidence Checklist</span>
                 </div>
-                <ul className="space-y-1.5 text-xs text-stone-700">
+                <ul className="space-y-1.5 text-xs text-secondary font-medium">
                   {evidenceChecklist.map((item, idx) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0 mt-1.5" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -716,15 +713,15 @@ export function ComplaintBuilder({
 
             {/* Suggested Escalation Paths */}
             {suggestedEscalation.length > 0 && (
-              <div className="p-4 rounded-xl bg-emerald-50/40 border border-emerald-200">
-                <div className="flex items-center gap-2 text-xs font-bold text-emerald-950 uppercase tracking-wide mb-2">
-                  <Compass className="w-4 h-4 text-emerald-700" />
+              <div className="p-4 rounded-xl bg-primary-light/40 border border-primary/20">
+                <div className="flex items-center gap-2 text-xs font-bold text-on-surface uppercase tracking-wide mb-2">
+                  <span className="material-symbols-outlined text-primary text-[20px]">explore</span>
                   <span>Escalation Steps If Unresolved within 48-72 Hours</span>
                 </div>
-                <ul className="space-y-1.5 text-xs text-emerald-900">
+                <ul className="space-y-1.5 text-xs text-secondary font-medium">
                   {suggestedEscalation.map((step, idx) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <span className="w-4 h-4 rounded-full bg-emerald-200 text-emerald-800 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="w-4 h-4 rounded-full bg-primary-fixed text-[#003828] text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                         {idx + 1}
                       </span>
                       <span>{step}</span>
@@ -735,16 +732,16 @@ export function ComplaintBuilder({
             )}
 
             {/* How to Send Instructions */}
-            <div className="p-4 rounded-xl bg-stone-100 border border-stone-200 text-xs text-stone-600 space-y-1">
-              <span className="font-bold text-stone-800 block">How to Use This Complaint:</span>
+            <div className="p-4 rounded-xl bg-[#FAF9F5] border border-[#E5E4DD] text-xs text-secondary space-y-1 font-medium">
+              <span className="font-bold text-on-surface block">How to Submit This Notice:</span>
               <p>
                 1. Click <strong>&quot;Copy Complaint Text&quot;</strong> above.
               </p>
               <p>
-                2. Paste it into your email app addressed to your platform&apos;s Grievance Officer or submit it inside the partner app support ticket.
+                2. Paste it into your email app addressed to the platform&apos;s Grievance Officer or submit inside the app support ticket.
               </p>
               <p>
-                3. Attach screenshots of your orders, rate card, and payout balance.
+                3. Attach order screenshots, GPS tracking records, and payout receipts.
               </p>
             </div>
           </div>
