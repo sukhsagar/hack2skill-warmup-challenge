@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Language, ProblemCategory, RightsResponse, WorkerOnboardingProfile } from '@/types';
 import { translations } from '@/lib/i18n';
-import { CROWDSOURCED_WORKER_PROBLEMS, CrowdSourcedIssue } from '@/lib/workerProblems';
+import { CROWDSOURCED_WORKER_PROBLEMS } from '@/lib/workerProblems';
 import {
   ExternalLink,
   ShieldAlert,

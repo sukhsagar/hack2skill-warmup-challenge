@@ -18,7 +18,15 @@ function MainApp() {
   const [language, setLanguage] = useState<Language>('en');
 
   // Worker onboarding profile (Optional personalization)
-  const [workerProfile, setWorkerProfile] = useState<WorkerOnboardingProfile | null>(null);
+  const [workerProfile, setWorkerProfile] = useState<WorkerOnboardingProfile | null>(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const savedProfile = localStorage.getItem('awaaz_worker_profile');
+      return savedProfile ? JSON.parse(savedProfile) : null;
+    } catch {
+      return null;
+    }
+  });
   const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
 
   // Passing state between Rights Navigator, Voice Assistant and Complaint Builder
@@ -30,19 +38,6 @@ function MainApp() {
   // Drafts count
   const [draftsCount, setDraftsCount] = useState<number>(0);
 
-  // Sync profile from localStorage on mount
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      const savedProfile = localStorage.getItem('awaaz_worker_profile');
-      if (savedProfile) {
-        setWorkerProfile(JSON.parse(savedProfile));
-      }
-    } catch (e) {
-      console.warn('Could not read saved worker profile', e);
-    }
-  }, []);
-
   const handleSaveProfile = (profile: WorkerOnboardingProfile) => {
     setWorkerProfile(profile);
     setShowOnboarding(false);
@@ -52,7 +47,7 @@ function MainApp() {
   };
 
   // Sync drafts count from localStorage
-  const updateDraftsCount = () => {
+  const updateDraftsCount = React.useCallback(() => {
     if (typeof window === 'undefined') return;
     const storageKey = `awaaz_drafts_${user?.uid || 'guest'}`;
     try {
@@ -66,15 +61,19 @@ function MainApp() {
     } catch {
       setDraftsCount(0);
     }
-  };
+  }, [user?.uid]);
 
   useEffect(() => {
-    updateDraftsCount();
-  }, [user]);
+    const timer = setTimeout(() => {
+      updateDraftsCount();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [updateDraftsCount]);
 
   const handleDraftComplaintFromIssue = (desc: string, cat: ProblemCategory) => {
     setPrefillDescription(desc);
     setPrefillCategory(cat);
+    setLastGuidanceSummary(desc);
     setActiveDraftToEdit(null);
     setCurrentTab('complaint');
   };

@@ -78,35 +78,44 @@ export function ComplaintBuilder({
   // Sync prefill props if changed
   useEffect(() => {
     if (prefillDescription) {
-      setFormData((prev) => ({
-        ...prev,
-        incidentDescription: prefillDescription,
-        category: prefillCategory || prev.category,
-      }));
+      const timer = setTimeout(() => {
+        setFormData((prev) => ({
+          ...prev,
+          incidentDescription: prefillDescription,
+          category: prefillCategory || prev.category,
+        }));
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [prefillDescription, prefillCategory]);
 
   // Sync draft to edit if provided
   useEffect(() => {
     if (activeDraftToEdit) {
-      setCurrentDraftId(activeDraftToEdit.id);
-      setSubject(activeDraftToEdit.subject);
-      setComplaintBody(activeDraftToEdit.complaintBody);
-      setEvidenceChecklist(activeDraftToEdit.evidenceChecklist || []);
-      setSuggestedEscalation(activeDraftToEdit.suggestedEscalation || []);
-      setFormData((prev) => ({
-        ...prev,
-        category: activeDraftToEdit.category,
-        platform: activeDraftToEdit.platform,
-        language: activeDraftToEdit.language,
-      }));
-      setStep('preview');
+      const timer = setTimeout(() => {
+        setCurrentDraftId(activeDraftToEdit.id);
+        setSubject(activeDraftToEdit.subject);
+        setComplaintBody(activeDraftToEdit.complaintBody);
+        setEvidenceChecklist(activeDraftToEdit.evidenceChecklist || []);
+        setSuggestedEscalation(activeDraftToEdit.suggestedEscalation || []);
+        setFormData((prev) => ({
+          ...prev,
+          category: activeDraftToEdit.category,
+          platform: activeDraftToEdit.platform,
+          language: activeDraftToEdit.language,
+        }));
+        setStep('preview');
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [activeDraftToEdit]);
 
   // Keep output language in sync if user changes top-level language
   useEffect(() => {
-    setFormData((prev) => ({ ...prev, language }));
+    const timer = setTimeout(() => {
+      setFormData((prev) => ({ ...prev, language }));
+    }, 0);
+    return () => clearTimeout(timer);
   }, [language]);
 
   const saveDraftToLocalStorage = (draft: ComplaintDraft) => {
@@ -386,10 +395,12 @@ export function ComplaintBuilder({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Category */}
             <div>
-              <label className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
+              <label htmlFor="complaint-category" className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
                 {t.categoryLabel} *
               </label>
               <select
+                id="complaint-category"
+                aria-required="true"
                 value={formData.category}
                 onChange={(e) =>
                   setFormData({ ...formData, category: e.target.value as ProblemCategory })
@@ -406,10 +417,12 @@ export function ComplaintBuilder({
 
             {/* Platform */}
             <div>
-              <label className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
+              <label htmlFor="complaint-platform" className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
                 {t.platformLabel} *
               </label>
               <select
+                id="complaint-platform"
+                aria-required="true"
                 value={formData.platform}
                 onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
                 className="w-full px-3.5 py-2.5 text-base rounded-xl border border-[#E5E4DD] bg-[#FAF9F5] focus:bg-white focus:border-primary focus:outline-none text-on-surface font-medium"
@@ -425,17 +438,20 @@ export function ComplaintBuilder({
 
           {/* Incident Description */}
           <div>
-            <label className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
+            <label htmlFor="complaint-description" className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
               {t.incidentDescLabel} *
             </label>
             <textarea
+              id="complaint-description"
               rows={4}
+              aria-required="true"
+              aria-describedby="desc-hint"
               value={formData.incidentDescription}
               onChange={(e) => setFormData({ ...formData, incidentDescription: e.target.value })}
               placeholder={t.incidentDescPlaceholder}
               className="w-full p-3.5 text-base rounded-xl border border-[#E5E4DD] bg-[#FAF9F5] focus:bg-white focus:border-primary focus:outline-none text-on-surface placeholder:text-outline font-medium"
             />
-            <p className="text-[12px] text-secondary mt-1">
+            <p id="desc-hint" className="text-[12px] text-secondary mt-1">
               Do not include confidential passwords, bank PINs, or OTPs.
             </p>
           </div>
@@ -443,10 +459,11 @@ export function ComplaintBuilder({
           {/* Optional specific fields */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
+              <label htmlFor="complaint-date" className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
                 {t.incidentDateLabel}
               </label>
               <input
+                id="complaint-date"
                 type="text"
                 value={formData.incidentDate || ''}
                 onChange={(e) => setFormData({ ...formData, incidentDate: e.target.value })}
@@ -456,10 +473,11 @@ export function ComplaintBuilder({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
+              <label htmlFor="complaint-amount" className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
                 {t.disputedAmountLabel}
               </label>
               <input
+                id="complaint-amount"
                 type="text"
                 value={formData.disputedAmount || ''}
                 onChange={(e) => setFormData({ ...formData, disputedAmount: e.target.value })}
@@ -469,10 +487,11 @@ export function ComplaintBuilder({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
+              <label htmlFor="complaint-worker-id" className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
                 {t.workerIdLabel}
               </label>
               <input
+                id="complaint-worker-id"
                 type="text"
                 value={formData.workerIdentifier || ''}
                 onChange={(e) => setFormData({ ...formData, workerIdentifier: e.target.value })}
@@ -484,10 +503,11 @@ export function ComplaintBuilder({
 
           {/* Desired Resolution */}
           <div>
-            <label className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
+            <label htmlFor="complaint-resolution" className="block text-xs font-bold text-secondary uppercase tracking-wide mb-1.5">
               {t.desiredResolutionLabel}
             </label>
             <input
+              id="complaint-resolution"
               type="text"
               value={formData.desiredResolution || ''}
               onChange={(e) => setFormData({ ...formData, desiredResolution: e.target.value })}

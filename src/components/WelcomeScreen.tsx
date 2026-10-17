@@ -3,7 +3,6 @@
 import React, { useState, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Language, ProblemCategory } from '@/types';
-import { translations } from '@/lib/i18n';
 
 interface WelcomeScreenProps {
   language: Language;
@@ -46,8 +45,6 @@ export function WelcomeScreen({
   const [isDrafting, setIsDrafting] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
-
-  const t = translations[language];
 
   // Placeholder texts per language
   const placeholders: Record<Language, string> = {
@@ -185,23 +182,18 @@ export function WelcomeScreen({
       {/* Top App Bar (Baseline Spec) */}
       <header className="fixed top-0 w-full z-50 bg-[#F8F7F2]/95 backdrop-blur-md border-b border-[#E5E4DD] pt-safe">
         <div className="h-16 px-4 flex items-center justify-between max-w-xl mx-auto w-full">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-primary flex items-center justify-center text-white font-bold text-xl shadow-xs">
-              आ
+          <div className="flex items-center gap-2.5">
+            <div className="h-12 w-auto max-w-[130px] sm:max-w-[150px] flex items-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo.png"
+                alt="Awaaz - Har Mazdoor Ki Awaaz"
+                className="h-10 w-auto object-contain drop-shadow-2xs"
+              />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[20px] font-bold text-on-surface tracking-tight leading-none">
-                  Awaaz
-                </span>
-                <span className="px-2 py-0.5 rounded-full bg-primary-fixed text-[#003828] text-[12px] font-bold uppercase tracking-wider">
-                  Help
-                </span>
-              </div>
-              <span className="text-[13px] font-medium text-secondary block mt-0.5">
-                {t.subTagline || 'Free Support for Gig Workers'}
-              </span>
-            </div>
+            <span className="px-2 py-0.5 rounded-full bg-primary-fixed text-[#003828] text-[11px] font-bold uppercase tracking-wider">
+              Help
+            </span>
           </div>
 
           <a
@@ -259,9 +251,17 @@ export function WelcomeScreen({
 
       {/* Main Content Container */}
       <main className="flex-1 flex flex-col w-full pt-32 pb-24 px-4 max-w-xl mx-auto">
-        {/* Title and Subhead */}
-        <section className="pt-2 pb-5">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#E6F4EE] text-primary text-[13px] font-bold tracking-wide uppercase mb-2.5">
+        {/* Prominent Brand Header & Hero Title */}
+        <section className="pt-2 pb-5 text-left">
+          <div className="mb-4 inline-block">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png"
+              alt="Awaaz - Har Mazdoor Ki Awaaz"
+              className="h-14 sm:h-16 w-auto object-contain filter drop-shadow-xs"
+            />
+          </div>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#E6F4EE] text-primary text-[13px] font-bold tracking-wide uppercase mb-2.5 block w-fit">
             <span>Verified Legal Aid</span>
           </div>
           <h1 className="text-[26px] sm:text-[28px] font-extrabold text-on-surface tracking-tight leading-tight mb-2">

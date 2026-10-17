@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Language, ProblemCategory } from '@/types';
 import {
   Mic,
@@ -55,25 +55,19 @@ export function VoiceAssistant({
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [editedTranscript, setEditedTranscript] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
+  const [isSupported, setIsSupported] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    const windowWithSpeech = window as unknown as {
+      SpeechRecognition?: new () => SpeechRecognitionInstance;
+      webkitSpeechRecognition?: new () => SpeechRecognitionInstance;
+    };
+    return Boolean(windowWithSpeech.SpeechRecognition || windowWithSpeech.webkitSpeechRecognition);
+  });
+  const [detectedIntent, setDetectedIntent] = useState<'rights' | 'complaint' | 'speak' | null>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [recognitionError, setRecognitionError] = useState<string | null>(null);
-  const [isSupported, setIsSupported] = useState(true);
-  const [detectedIntent, setDetectedIntent] = useState<'rights' | 'complaint' | 'speak' | null>(null);
 
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
-
-  // Check SpeechRecognition support on mount
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const windowWithSpeech = window as unknown as {
-        SpeechRecognition?: new () => SpeechRecognitionInstance;
-        webkitSpeechRecognition?: new () => SpeechRecognitionInstance;
-      };
-      const hasSpeech = Boolean(windowWithSpeech.SpeechRecognition || windowWithSpeech.webkitSpeechRecognition);
-      setIsSupported(hasSpeech);
-    }
-  }, []);
 
   // Set recognition language
   const getRecognitionLang = (lang: Language) => {

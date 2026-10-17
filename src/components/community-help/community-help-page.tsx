@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { Language } from '@/types';
-import { CommunityRequest } from './types';
 import { getPersistenceStatus, loadUserRequests } from './storage';
 import { communityI18n } from './i18n';
 import { LegalHelpForm } from './legal-help-form';
@@ -27,7 +26,10 @@ export function CommunityHelpPage() {
   const { user } = useAuth();
   const [language, setLanguage] = useState<Language>('en');
   const [activeTab, setActiveTab] = useState<'legal' | 'medical' | 'requests' | 'safety'>('legal');
-  const [requestCount, setRequestCount] = useState<number>(0);
+  const [requestCount, setRequestCount] = useState<number>(() => {
+    if (typeof window === 'undefined') return 0;
+    return loadUserRequests(user?.uid).length;
+  });
 
   const t = communityI18n[language] || communityI18n.en;
   const persistenceStatus = getPersistenceStatus();
@@ -39,7 +41,10 @@ export function CommunityHelpPage() {
   }, [user?.uid]);
 
   useEffect(() => {
-    syncCount();
+    const timer = setTimeout(() => {
+      syncCount();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [syncCount]);
 
   const handleRequestSubmitted = () => {
@@ -65,14 +70,20 @@ export function CommunityHelpPage() {
                 <span className="hidden sm:inline">Back to Dashboard</span>
               </Link>
               <div className="h-5 w-px bg-[#E5E4DD] hidden sm:block" />
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-base sm:text-lg font-extrabold text-on-surface tracking-tight">
-                    {t.pageTitle}
-                  </h1>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary-light text-primary border border-primary/20">
-                    Awaaz Community
-                  </span>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-white border border-[#E5E4DD] flex items-center justify-center overflow-hidden p-0.5 shadow-2xs">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/logo.png" alt="Awaaz" className="w-full h-full object-contain" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-base sm:text-lg font-extrabold text-on-surface tracking-tight">
+                      {t.pageTitle}
+                    </h1>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary-light text-primary border border-primary/20">
+                      Awaaz Community
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

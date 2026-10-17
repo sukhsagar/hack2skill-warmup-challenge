@@ -27,7 +27,15 @@ export function DraftsList({
   const { user } = useAuth();
   const t = translations[language];
 
-  const [drafts, setDrafts] = useState<ComplaintDraft[]>([]);
+  const [drafts, setDrafts] = useState<ComplaintDraft[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const data = localStorage.getItem(`awaaz_drafts_${user?.uid || 'guest'}`);
+      return data ? JSON.parse(data) : [];
+    } catch {
+      return [];
+    }
+  });
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const storageKey = `awaaz_drafts_${user?.uid || 'guest'}`;
@@ -51,7 +59,10 @@ export function DraftsList({
   }, [storageKey, onDraftCountChange]);
 
   useEffect(() => {
-    loadDrafts();
+    const timer = setTimeout(() => {
+      loadDrafts();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [loadDrafts]);
 
   const handleDelete = (id: string, e: React.MouseEvent) => {

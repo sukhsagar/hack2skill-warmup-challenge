@@ -39,8 +39,11 @@ export function RequestList({
   const t = communityI18n[language] || communityI18n.en;
 
   const [feedMode, setFeedMode] = useState<'my_requests' | 'sample_feed'>('my_requests');
-  const [requests, setRequests] = useState<CommunityRequest[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [requests, setRequests] = useState<CommunityRequest[]>(() => {
+    if (typeof window === 'undefined') return [];
+    return loadUserRequests(userId);
+  });
+  const [loading, setLoading] = useState<boolean>(false);
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
@@ -60,7 +63,10 @@ export function RequestList({
   }, [feedMode, userId]);
 
   useEffect(() => {
-    refreshRequests();
+    const timer = setTimeout(() => {
+      refreshRequests();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [refreshRequests]);
 
   const handleStatusChange = async (

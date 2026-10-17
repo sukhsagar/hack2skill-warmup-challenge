@@ -27,26 +27,35 @@ const DEMO_STORAGE_KEY = 'awaaz_demo_user';
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    // 1. Check demo user first from sessionStorage
+  const [user, setUser] = useState<UserProfile | null>(() => {
+    if (typeof window === 'undefined') return null;
     try {
       const storedDemo = sessionStorage.getItem(DEMO_STORAGE_KEY);
       if (storedDemo) {
-        const parsed = JSON.parse(storedDemo);
-        setUser(parsed);
-        setLoading(false);
-        return;
+        return JSON.parse(storedDemo);
       }
     } catch {
       sessionStorage.removeItem(DEMO_STORAGE_KEY);
     }
+    return null;
+  });
+  const [loading, setLoading] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    try {
+      const storedDemo = sessionStorage.getItem(DEMO_STORAGE_KEY);
+      if (storedDemo) return false;
+    } catch {}
+    return Boolean(isFirebaseConfigured && auth);
+  });
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // If demo user is already active, skip Firebase listener
+    if (user?.isDemoUser) {
+      return;
+    }
 
     if (!isFirebaseConfigured || !auth) {
-      setLoading(false);
       return;
     }
 
@@ -84,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [user?.isDemoUser]);
 
   const handleSignInWithGoogle = async () => {
     setError(null);

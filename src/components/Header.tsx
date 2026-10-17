@@ -31,25 +31,20 @@ export function Header({
         <div className="h-16 flex items-center justify-between">
           {/* Logo & Branding */}
           <div
-            className="flex items-center gap-3 cursor-pointer select-none"
+            className="flex items-center gap-2.5 cursor-pointer select-none"
             onClick={() => setCurrentTab('rights')}
           >
-            <div className="w-11 h-11 rounded-xl bg-primary flex items-center justify-center text-white font-bold text-xl shadow-xs">
-              आ
+            <div className="h-11 w-auto max-w-[140px] flex items-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo.png"
+                alt="Awaaz - Har Mazdoor Ki Awaaz"
+                className="h-9 sm:h-10 w-auto object-contain drop-shadow-2xs"
+              />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[20px] font-bold text-on-surface tracking-tight leading-none">
-                  Awaaz
-                </span>
-                <span className="px-2 py-0.5 rounded-full bg-primary-fixed text-[#003828] text-[12px] font-bold uppercase tracking-wider">
-                  Help
-                </span>
-              </div>
-              <span className="text-[13px] font-medium text-secondary block mt-0.5">
-                {t.subTagline || 'Free Support for Gig Workers'}
-              </span>
-            </div>
+            <span className="px-2 py-0.5 rounded-full bg-primary-fixed text-[#003828] text-[11px] font-bold uppercase tracking-wider">
+              Help
+            </span>
           </div>
 
           {/* Right Action buttons */}
@@ -192,6 +187,14 @@ export function Header({
                 </span>
               )}
             </button>
+
+            <a
+              href="/community-help"
+              className="flex items-center gap-2 px-3.5 py-2 text-[14px] font-bold border-b-2 border-transparent text-secondary hover:text-primary transition-all whitespace-nowrap"
+            >
+              <span className="material-symbols-outlined text-[18px]">handshake</span>
+              <span>Community Help</span>
+            </a>
           </nav>
         )}
       </div>
