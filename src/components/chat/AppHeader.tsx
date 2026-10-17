@@ -25,21 +25,21 @@ export function AppHeader({
         <div className="h-18 flex items-center justify-between gap-3">
           {/* Logo & Brand Identity */}
           <div className="flex items-center gap-3 select-none">
-            <div className="relative w-12 h-12 rounded-2xl bg-[#0B3328] overflow-hidden flex items-center justify-center shadow-xs border border-[#0B3328]/10 shrink-0">
+            <div className="relative w-12 h-12 rounded-2xl bg-white overflow-hidden flex items-center justify-center shadow-xs border border-[#DDE5DD] shrink-0 p-1">
               <Image
                 src="/logo.png"
                 alt="Awaaz Logo"
-                width={48}
-                height={48}
+                width={44}
+                height={44}
                 priority
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
                 onError={(e) => {
                   // Fallback to text if image fails to load
                   const target = e.currentTarget;
                   target.style.display = 'none';
                   const parent = target.parentElement;
                   if (parent) {
-                    parent.innerHTML = `<span class="text-white font-extrabold text-2xl">आ</span>`;
+                    parent.innerHTML = `<span class="text-[#0B3328] font-extrabold text-2xl">आ</span>`;
                   }
                 }}
               />

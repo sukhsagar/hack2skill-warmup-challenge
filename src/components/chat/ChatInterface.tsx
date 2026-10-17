@@ -158,7 +158,7 @@ export function ChatInterface({
   return (
     <div className="flex flex-col min-h-[calc(100vh-140px)]">
       {/* Scrollable Conversation Stream */}
-      <div className="flex-1 px-4 sm:px-6 py-4 max-w-4xl mx-auto w-full pb-32">
+      <div className="flex-1 px-4 sm:px-6 py-4 max-w-4xl mx-auto w-full pb-48 sm:pb-52">
         {/* If no messages yet, display welcoming chat home */}
         {messages.length === 0 ? (
           <div className="space-y-6 pt-2 sm:pt-4">

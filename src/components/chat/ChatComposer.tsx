@@ -69,7 +69,7 @@ export function ChatComposer({
   }, [inputText]);
 
   return (
-    <div className="sticky bottom-16 sm:bottom-0 left-0 right-0 z-30 bg-[#F7F8F3]/95 backdrop-blur-md border-t border-[#DDE5DD] p-3 sm:p-4">
+    <div className="fixed bottom-16 sm:bottom-18 left-0 right-0 z-30 bg-[#F7F8F3]/98 backdrop-blur-md border-t border-[#DDE5DD] p-3 sm:p-4 shadow-sm">
       <div className="max-w-4xl mx-auto">
         <form
           onSubmit={handleSubmit}
